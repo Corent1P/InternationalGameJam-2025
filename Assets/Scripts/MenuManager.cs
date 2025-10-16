@@ -6,7 +6,9 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private GameObject optionsMenu;
     [SerializeField] private GameObject playMenu;
     [SerializeField] private GameObject joinMenu;
+    [SerializeField] private GameObject hostMenu;
     [SerializeField] private GameObject usernameMenu;
+    [SerializeField] private GameObject authMenu;
 
     private void Start()
     {
@@ -19,7 +21,9 @@ public class MenuManager : MonoBehaviour
         optionsMenu.SetActive(false);
         playMenu.SetActive(false);
         joinMenu.SetActive(false);
+        hostMenu.SetActive(false);
         usernameMenu.SetActive(false);
+        authMenu.SetActive(false);
     }
     public void ShowOptionsMenu()
     {
@@ -27,7 +31,9 @@ public class MenuManager : MonoBehaviour
         optionsMenu.SetActive(true);
         playMenu.SetActive(false);
         joinMenu.SetActive(false);
+        hostMenu.SetActive(false);
         usernameMenu.SetActive(false);
+        authMenu.SetActive(false);
     }
 
     public void ShowPlayMenu()
@@ -36,7 +42,9 @@ public class MenuManager : MonoBehaviour
         optionsMenu.SetActive(false);
         playMenu.SetActive(true);
         joinMenu.SetActive(false);
+        hostMenu.SetActive(false);
         usernameMenu.SetActive(false);
+        authMenu.SetActive(false);
     }
 
     public void ShowJoinMenu()
@@ -45,7 +53,9 @@ public class MenuManager : MonoBehaviour
         optionsMenu.SetActive(false);
         playMenu.SetActive(false);
         joinMenu.SetActive(true);
+        hostMenu.SetActive(false);
         usernameMenu.SetActive(false);
+        authMenu.SetActive(false);
     }
 
     public void ShowUsernameMenu()
@@ -54,6 +64,30 @@ public class MenuManager : MonoBehaviour
         optionsMenu.SetActive(false);
         playMenu.SetActive(false);
         joinMenu.SetActive(false);
+        hostMenu.SetActive(false);
         usernameMenu.SetActive(true);
+        authMenu.SetActive(false);
+    }
+
+    public void ShowAuthMenu()
+    {
+        mainMenu.SetActive(false);
+        optionsMenu.SetActive(false);
+        playMenu.SetActive(false);
+        joinMenu.SetActive(false);
+        hostMenu.SetActive(false);
+        usernameMenu.SetActive(false);
+        authMenu.SetActive(true);
+    }
+
+    public void ShowHostMenu()
+    {
+        mainMenu.SetActive(false);
+        optionsMenu.SetActive(false);
+        playMenu.SetActive(false);
+        joinMenu.SetActive(false);
+        usernameMenu.SetActive(false);
+        authMenu.SetActive(false);
+        hostMenu.SetActive(true);
     }
 }
