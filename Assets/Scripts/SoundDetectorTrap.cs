@@ -2,8 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(AudioSource))]
-public class SoundDetectorTrap : TrapBase
-{
+public class SoundDetectorTrap : TrapBase {
     [Header("Sound Settings")]
     public AudioClip triggerSound;
     [Range(0f, 1f)] public float volume = 1f;

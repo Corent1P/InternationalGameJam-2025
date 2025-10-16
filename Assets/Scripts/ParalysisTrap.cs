@@ -1,8 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
-public class ParalysisTrap : TrapBase
-{
+public class ParalysisTrap : TrapBase {
+    [Header("Paralysis Settings")]
     public float paralysisDuration = 3f;
 
     protected override void ActivateTrap(PlayerController player)

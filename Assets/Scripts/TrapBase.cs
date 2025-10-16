@@ -1,10 +1,11 @@
 using UnityEngine;
 using System.Collections;
 
-public abstract class TrapBase : MonoBehaviour
-{
+public abstract class TrapBase : MonoBehaviour {
+    [Header("TrapBase Settings")]
     public bool canRearm = false;
     public float rearmDelay = 5f;
+
     private bool hasTriggered = false;
 
     private void OnTriggerEnter(Collider other) {
