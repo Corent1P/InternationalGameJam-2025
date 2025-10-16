@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public abstract class TrapBase : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public abstract class TrapBase : MonoBehaviour
         if (other.tag != "Child")
             return;
 
-        PlayerMovement player = other.GetComponent<PlayerMovement>();
+        PlayerController player = other.GetComponent<PlayerController>();
 
         if (player != null) {
             hasTriggered = true;
@@ -22,10 +23,10 @@ public abstract class TrapBase : MonoBehaviour
     }
 
     private void OnTriggerExit(Collider other) {
-        if (other.tag != "Child" || !canRearm)
+        if (other.tag != "Child")
             return;
 
-        if (hasTriggered)
+        if (hasTriggered && canRearm)
             StartCoroutine(RearmTrap());
     }
 
@@ -36,5 +37,5 @@ public abstract class TrapBase : MonoBehaviour
     }
 
     protected virtual void OnRearmed() {}
-    protected abstract void ActivateTrap(PlayerMovement player);
+    protected abstract void ActivateTrap(PlayerController player);
 }
