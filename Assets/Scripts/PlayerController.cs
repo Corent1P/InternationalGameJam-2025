@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
@@ -12,6 +13,8 @@ public class PlayerController : MonoBehaviour
     public float mouseSensitivity = 2f;
     public Transform cameraTransform;
 
+    private Coroutine slowCoroutine;
+    private float originalSpeed;
     private bool canMove = true;
     private Rigidbody rb;
     private PlayerInputs inputActions;
@@ -24,6 +27,26 @@ public class PlayerController : MonoBehaviour
     {
         get { return canMove; }
         set { canMove = value; }
+    }
+
+    public void ApplySlow(float slowMultiplier, float duration)
+    {
+        if (slowCoroutine != null)
+            StopCoroutine(slowCoroutine);
+        slowCoroutine = StartCoroutine(SlowDownRoutine(slowMultiplier, duration));
+    }
+
+    private IEnumerator SlowDownRoutine(float slowMultiplier, float duration)
+    {
+        moveSpeed *= slowMultiplier;
+        yield return new WaitForSeconds(duration);
+        moveSpeed = originalSpeed;
+        slowCoroutine = null;
+    }
+
+    private void Start()
+    {
+        originalSpeed = moveSpeed;
     }
 
     private void Awake()
