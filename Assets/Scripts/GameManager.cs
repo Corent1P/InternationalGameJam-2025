@@ -108,7 +108,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    private void  OnDestroy()
+    private void OnDestroy()
     {
         if (Instance == this)
         {
@@ -202,7 +202,6 @@ public class GameManager : NetworkBehaviour
         if (!IsServer) return;
 
         Debug.Log($"Client {clientId} disconnected from game");
-
         if (playerStatesByID.ContainsKey(clientId))
         {
             playerStatesByID.Remove(clientId);
