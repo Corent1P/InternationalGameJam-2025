@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2296351218686693689}
   - component: {fileID: 8829409342569265769}
   - component: {fileID: 4454820076005474075}
+  - component: {fileID: -6043833220028392228}
   - component: {fileID: 1174796772049702754}
   m_Layer: 0
   m_Name: CandyFountain
@@ -112,6 +113,31 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!114 &-6043833220028392228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2298444570754790036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 996820272
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &1174796772049702754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,13 +150,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0e2c8d763f284af390606335f03b85c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   candyPrefab: {fileID: 1224183604949921331, guid: baf45b56ac8ee4b248568c946157c69f, type: 3}
   spawnPoint: {fileID: 5282551009590314291}
   respawnCooldown: 10
+  launchForce: 3
   interactionDistance: 3
   interactKey: 101
   interactionText: {fileID: 0}
   interactionHint: Press E to collect candy
+  inventoryFullHint: Inventory full!
 --- !u!1 &3579428979482076152
 GameObject:
   m_ObjectHideFlags: 0

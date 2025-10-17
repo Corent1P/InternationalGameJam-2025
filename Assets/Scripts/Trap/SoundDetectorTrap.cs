@@ -11,20 +11,17 @@ public class SoundDetectorTrap : TrapBase {
     private AudioSource audioSource;
     private bool permanentlyDisabled = false;
 
-    private void Awake()
-    {
+    private void Awake() {
         audioSource = GetComponent<AudioSource>();
         audioSource.playOnAwake = false;
     }
 
-    protected override void ActivateTrap(PlayerController player)
-    {
+    protected override void ActivateTrap(NetworkChildrenController child) {
         if (permanentlyDisabled)
             return;
 
-        if (triggerSound != null) {
+        if (triggerSound != null)
             audioSource.PlayOneShot(triggerSound, volume);
-        }
 
         if (playOnce)
             permanentlyDisabled = true;
