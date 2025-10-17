@@ -50,10 +50,34 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3361415967608448148, guid: c66a350aaea42434ebbe764ff712de12, type: 3}
       propertyPath: m_Name
-      value: TrapBase
+      value: GoulagTrap
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3361415967608448148, guid: c66a350aaea42434ebbe764ff712de12, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8868878092251709658}
   m_SourcePrefab: {fileID: 100100000, guid: c66a350aaea42434ebbe764ff712de12, type: 3}
+--- !u!1 &3468597561850981788 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3361415967608448148, guid: c66a350aaea42434ebbe764ff712de12, type: 3}
+  m_PrefabInstance: {fileID: 2199103630316488968}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8868878092251709658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3468597561850981788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2df6e588c3f9d425d825de8b63286027, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canRearm: 0
+  rearmDelay: 5
+  goulagSpawnPoint: {fileID: 0}
+  releaseSpawnPoint: {fileID: 0}
