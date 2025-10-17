@@ -22,11 +22,11 @@ public class Player5 : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
-        GameManager.Instance.playerStatesByID[accountID.Value.ToString()] = new PlayerData(NetworkManager.Singleton.LocalClientId, transform.position, health.Value, attack.Value);
+        GameManager5.Instance.playerStatesByID[accountID.Value.ToString()] = new PlayerData_tmp(NetworkManager.Singleton.LocalClientId, transform.position, health.Value, attack.Value);
         Debug.Log($"Player5: Despawning player {accountID.Value} and saving state.");
     }
 
-    public void SetData(PlayerData data)
+    public void SetData(PlayerData_tmp data)
     {
         accountID.Value = data.ClientId.ToString();
         health.Value = data.Health;
@@ -35,14 +35,14 @@ public class Player5 : NetworkBehaviour
     }
 }
 
-public class PlayerData
+public class PlayerData_tmp
 {
     public ulong ClientId { get; set; }
     public UnityEngine.Vector3 Position { get; set; }
     public int Health { get; set; }
     public int Attack { get; set; }
 
-    public PlayerData(ulong clientId, UnityEngine.Vector3 position, int health, int attack)
+    public PlayerData_tmp(ulong clientId, UnityEngine.Vector3 position, int health, int attack)
     {
         ClientId = clientId;
         Position = position;

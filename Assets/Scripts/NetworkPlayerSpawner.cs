@@ -18,45 +18,45 @@ public class NetworkPlayerSpawner : NetworkBehaviour
         // Initialiser la liste des spawn points disponibles
         ResetSpawnPoints();
 
-        // S'abonner aux événements de connexion
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+        // // S'abonner aux événements de connexion
+        // NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        // NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
-        // Si l'hôte est déjà connecté (ce qui est le cas au Start), spawner son joueur
-        if (NetworkManager.Singleton.IsHost)
-        {
-            SpawnPlayerForClient(NetworkManager.Singleton.LocalClientId);
-        }
+        // // Si l'hôte est déjà connecté (ce qui est le cas au Start), spawner son joueur
+        // if (NetworkManager.Singleton.IsHost)
+        // {
+        //     SpawnPlayerForClient(NetworkManager.Singleton.LocalClientId);
+        // }
     }
 
-    private void OnDestroy()
-    {
-        if (NetworkManager.Singleton != null)
-        {
-            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
-            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
-        }
-    }
+    // private void OnDestroy()
+    // {
+    //     if (NetworkManager.Singleton != null)
+    //     {
+    //         NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+    //         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+    //     }
+    // }
 
-    private void OnClientConnected(ulong clientId)
-    {
-        if (!IsServer) return;
+    // private void OnClientConnected(ulong clientId)
+    // {
+    //     if (!IsServer) return;
 
-        Debug.Log($"Client {clientId} connected, spawning player...");
-        SpawnPlayerForClient(clientId);
-    }
+    //     Debug.Log($"Client {clientId} connected, spawning player...");
+    //     SpawnPlayerForClient(clientId);
+    // }
 
-    private void OnClientDisconnected(ulong clientId)
-    {
-        if (!IsServer) return;
+    // private void OnClientDisconnected(ulong clientId)
+    // {
+    //     if (!IsServer) return;
 
-        Debug.Log($"Client {clientId} disconnected");
-        // Le NetworkObject se détruit automatiquement
-        // Mais on peut remettre le spawn point disponible si nécessaire
-        ResetSpawnPoints();
-    }
+    //     Debug.Log($"Client {clientId} disconnected");
+    //     // Le NetworkObject se détruit automatiquement
+    //     // Mais on peut remettre le spawn point disponible si nécessaire
+    //     ResetSpawnPoints();
+    // }
 
-    private void SpawnPlayerForClient(ulong clientId)
+    public void SpawnPlayerForClient(ulong clientId)
     {
         // Obtenir une position de spawn
         Vector3 spawnPosition = GetSpawnPosition();
@@ -127,7 +127,7 @@ public class NetworkPlayerSpawner : NetworkBehaviour
         return Quaternion.identity;
     }
 
-    private void ResetSpawnPoints()
+    public void ResetSpawnPoints()
     {
         availableSpawnPoints.Clear();
         if (spawnPoints != null)

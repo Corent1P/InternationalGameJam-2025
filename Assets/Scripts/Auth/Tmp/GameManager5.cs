@@ -3,12 +3,12 @@ using Unity.Netcode;
 using System.Collections.Generic;
 using System;
 
-public class GameManager : NetworkBehaviour
+public class GameManager5 : NetworkBehaviour
 {
 
-    public static GameManager Instance { get; private set; }
+    public static GameManager5 Instance { get; private set; }
     public GameObject playerPrefab;
-    public Dictionary<string, PlayerData> playerStatesByID = new();
+    public Dictionary<string, PlayerData_tmp> playerStatesByID = new();
 
     public Action OnConnection;
 
@@ -59,9 +59,9 @@ public class GameManager : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void RegisterPlayerServerRpc(string clientId, ulong ID)
     {
-        if (!playerStatesByID.TryGetValue(clientId, out PlayerData playerData))
+        if (!playerStatesByID.TryGetValue(clientId, out PlayerData_tmp playerData))
         {
-            PlayerData newPlayerData = new PlayerData(ID, Vector3.zero, 100, 5);
+            PlayerData_tmp newPlayerData = new PlayerData_tmp(ID, Vector3.zero, 100, 5);
             playerStatesByID[clientId] = newPlayerData;
             SpawnPlayerServer(ID, newPlayerData);
             Debug.Log($"Registered new player with ID {clientId} and spawned at position {newPlayerData.Position}.");
@@ -74,7 +74,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    public void SpawnPlayerServer(ulong ID, PlayerData playerData)
+    public void SpawnPlayerServer(ulong ID, PlayerData_tmp playerData)
     {
         if (!IsServer) return;
 

@@ -134,12 +134,12 @@ public class Tmp_Player : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
-        GameManager.Instance.playerStatesByID[accountID.Value.ToString()] = new PlayerData(NetworkManager.Singleton.LocalClientId, transform.position, health.Value, attack.Value);
+        GameManager5.Instance.playerStatesByID[accountID.Value.ToString()] = new PlayerData_tmp(NetworkManager.Singleton.LocalClientId, transform.position, health.Value, attack.Value);
         Debug.Log($"Player5: Despawning player {accountID.Value} and saving state.");
         Debug.Log($"Player5: Saved state - Position: {transform.position}, Health: {health.Value}, Attack: {attack.Value}");
     }
 
-    public void SetData(PlayerData data)
+    public void SetData(PlayerData_tmp data)
     {
         accountID.Value = data.ClientId.ToString();
         health.Value = data.Health;
