@@ -78,6 +78,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canRearm: 0
-  rearmDelay: 5
+  rearmDelay: 10
   slowMultiplier: 0.5
   slowDuration: 5

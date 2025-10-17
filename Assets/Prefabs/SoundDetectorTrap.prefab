@@ -180,5 +180,5 @@ MonoBehaviour:
   canRearm: 1
   rearmDelay: 10
   triggerSound: {fileID: 8300000, guid: 793dca6f95bbf491eb014f83b6d3bd3e, type: 3}
-  volume: 1
+  volume: 0.658
   playOnce: 0
