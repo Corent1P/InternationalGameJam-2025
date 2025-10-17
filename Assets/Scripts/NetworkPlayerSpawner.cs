@@ -1,11 +1,13 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class NetworkPlayerSpawner : NetworkBehaviour
 {
     [Header("Spawn Settings")]
-    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private GameObject childrenPlayerPrefab;
+    [SerializeField] private GameObject adultPlayerPrefab;
     [SerializeField] private Transform[] spawnPoints;
     [SerializeField] private bool randomizeSpawnPoints = true;
 
@@ -17,53 +19,17 @@ public class NetworkPlayerSpawner : NetworkBehaviour
 
         // Initialiser la liste des spawn points disponibles
         ResetSpawnPoints();
-
-        // // S'abonner aux événements de connexion
-        // NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-        // NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
-
-        // // Si l'hôte est déjà connecté (ce qui est le cas au Start), spawner son joueur
-        // if (NetworkManager.Singleton.IsHost)
-        // {
-        //     SpawnPlayerForClient(NetworkManager.Singleton.LocalClientId);
-        // }
     }
 
-    // private void OnDestroy()
-    // {
-    //     if (NetworkManager.Singleton != null)
-    //     {
-    //         NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
-    //         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
-    //     }
-    // }
-
-    // private void OnClientConnected(ulong clientId)
-    // {
-    //     if (!IsServer) return;
-
-    //     Debug.Log($"Client {clientId} connected, spawning player...");
-    //     SpawnPlayerForClient(clientId);
-    // }
-
-    // private void OnClientDisconnected(ulong clientId)
-    // {
-    //     if (!IsServer) return;
-
-    //     Debug.Log($"Client {clientId} disconnected");
-    //     // Le NetworkObject se détruit automatiquement
-    //     // Mais on peut remettre le spawn point disponible si nécessaire
-    //     ResetSpawnPoints();
-    // }
-
-    public void SpawnPlayerForClient(ulong clientId)
+    public void SpawnPlayerForClient(ulong clientId, Team team)
     {
         // Obtenir une position de spawn
         Vector3 spawnPosition = GetSpawnPosition();
         Quaternion spawnRotation = GetSpawnRotation();
 
         // Instancier le joueur
-        GameObject playerInstance = Instantiate(playerPrefab, spawnPosition, spawnRotation);
+        GameObject playerInstance = Instantiate(team == Team.Children ? childrenPlayerPrefab : adultPlayerPrefab, spawnPosition, spawnRotation);
+        playerInstance.tag = (team == Team.Children) ? "Child" : "Adult";
         NetworkObject networkObject = playerInstance.GetComponent<NetworkObject>();
 
         if (networkObject == null)
@@ -133,16 +99,6 @@ public class NetworkPlayerSpawner : NetworkBehaviour
         if (spawnPoints != null)
         {
             availableSpawnPoints.AddRange(spawnPoints);
-        }
-    }
-
-    // Méthode optionnelle pour spawner manuellement (debug)
-    [ContextMenu("Spawn Player for Host")]
-    private void SpawnPlayerForHost()
-    {
-        if (IsServer)
-        {
-            SpawnPlayerForClient(NetworkManager.Singleton.LocalClientId);
         }
     }
 }

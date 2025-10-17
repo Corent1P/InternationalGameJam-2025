@@ -1,20 +1,34 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using System.Collections;
+
+public enum Team
+{
+    Children,
+    Adults
+}
 
 public class GameManager : NetworkBehaviour
 {
     public static GameManager Instance { get; private set; }
-    
+
     [Header("References")]
     [SerializeField] private NetworkPlayerSpawner playerSpawner;
-    
+
     [Header("Game Data")]
     public Dictionary<ulong, PlayerData> playerStatesByID = new();
 
+    [SerializeField] private float waitingTimeForJoiningPlayers = 15f;
+    private bool hasAdultBeenAssigned = false;
+    private bool hasBeenSpawned = false;
+
+    private int expectedPlayerCount;
+    private List<ulong> readyPlayers = new List<ulong>();
+
     private void Awake()
     {
-        // Singleton simple SANS DontDestroyOnLoad
         if (Instance == null)
         {
             Instance = this;
@@ -29,28 +43,47 @@ public class GameManager : NetworkBehaviour
     {
         base.OnNetworkSpawn();
 
-        // S'assurer qu'on est bien sur le serveur
-        if (!IsServer) 
+        if (!IsServer)
         {
             Debug.Log("GameManager spawned on client.");
             return;
         }
-
         Debug.Log("GameManager spawned on server.");
+        expectedPlayerCount = PlayerPrefs.GetInt("MaxPlayers", 4);
 
-        // S'abonner aux événements de connexion
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
-        // Spawner les joueurs déjà connectés (y compris l'hôte)
-        foreach (var clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        StartCoroutine(WaitForAllPlayersAndAssignTeams());
+    }
+
+    private IEnumerator WaitForAllPlayersAndAssignTeams()
+    {
+        int expectedPlayers = PlayerPrefs.GetInt("MaxPlayers", 4);
+        float timeout = waitingTimeForJoiningPlayers;
+        float elapsed = 0f;
+        
+        while (NetworkManager.Singleton.ConnectedClientsIds.Count < expectedPlayers && elapsed < timeout)
         {
-            // Vérifier si le joueur n'a pas déjà un PlayerObject
-            if (!NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject)
-            {
-                Debug.Log($"Spawning player for already connected client {clientId}");
-                playerSpawner.SpawnPlayerForClient(clientId);
-            }
+            yield return new WaitForSeconds(0.5f);
+            elapsed += 0.5f;
+        }
+        
+        AssignTeamsAndSpawnPlayers();
+        hasBeenSpawned = true;
+    }
+    
+    private void AssignTeamsAndSpawnPlayers()
+    {
+        List<ulong> allClients = new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds);
+        
+        // Choisir aléatoirement un adulte
+        int adultIndex = Random.Range(0, allClients.Count);
+        
+        for (int i = 0; i < allClients.Count; i++)
+        {
+            Team team = (i == adultIndex) ? Team.Adults : Team.Children;
+            playerSpawner.SpawnPlayerForClient(allClients[i], team);
         }
     }
 
@@ -78,11 +111,11 @@ public class GameManager : NetworkBehaviour
         if (!IsServer) return;
 
         Debug.Log($"Client {clientId} connected to game, spawning player...");
-        
-        // Vérifier si le joueur n'a pas déjà un PlayerObject
-        if (!NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject)
+
+        if (!NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject && hasBeenSpawned)
         {
-            playerSpawner.SpawnPlayerForClient(clientId);
+            Debug.Log($"---------------------- Spawning player for client {clientId}");
+            playerSpawner.SpawnPlayerForClient(clientId, Team.Children); // Default to Children team; modify as needed
         }
         else
         {
@@ -95,18 +128,15 @@ public class GameManager : NetworkBehaviour
         if (!IsServer) return;
 
         Debug.Log($"Client {clientId} disconnected from game");
-        
-        // Nettoyer les données du joueur
+
         if (playerStatesByID.ContainsKey(clientId))
         {
             playerStatesByID.Remove(clientId);
         }
-        
-        // Réinitialiser les spawn points
+
         playerSpawner.ResetSpawnPoints();
     }
 
-    // Méthode pour enregistrer les données d'un joueur
     public void RegisterPlayerData(ulong clientId, PlayerData data)
     {
         if (!IsServer) return;
@@ -115,7 +145,6 @@ public class GameManager : NetworkBehaviour
         Debug.Log($"Registered player data for client {clientId}");
     }
 
-    // Méthode pour récupérer les données d'un joueur
     public PlayerData GetPlayerData(ulong clientId)
     {
         if (playerStatesByID.TryGetValue(clientId, out PlayerData data))

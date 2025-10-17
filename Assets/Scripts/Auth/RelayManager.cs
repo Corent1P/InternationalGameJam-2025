@@ -191,8 +191,9 @@ public class RelayManager : MonoBehaviour
 
             // Démarrer l'hôte
             NetworkManager.Singleton.StartHost();
-            
+
             hasJoinedRelay = true;
+            PlayerPrefs.SetInt("MaxPlayers", lobbyManager.joinLobby.MaxPlayers);
 
             // Charger la scène de jeu
             NetworkManager.Singleton.SceneManager.LoadScene(gameSceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);

@@ -327,7 +327,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  playerPrefab: {fileID: 7061703400762349780, guid: d7615a8dcec114388b10ed46cc61f643, type: 3}
+  childrenPlayerPrefab: {fileID: 8598351432387663026, guid: c7db920d51923480ca225c14e1e78b32, type: 3}
+  adultPlayerPrefab: {fileID: 2400686109029718724, guid: 543e740818b1d44c7a480068faa924d7, type: 3}
   spawnPoints:
   - {fileID: 1989686853}
   - {fileID: 255026873}
