@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
@@ -12,12 +13,41 @@ public class PlayerController : MonoBehaviour
     public float mouseSensitivity = 2f;
     public Transform cameraTransform;
 
+    private Coroutine slowCoroutine;
+    private float originalSpeed;
+    private bool canMove = true;
     private Rigidbody rb;
     private PlayerInputs inputActions;
     private Vector2 moveInput;
     private Vector2 lookInput;
     private float xRotation = 0f;
     private bool isGrounded = true;
+
+    public bool CanMove
+    {
+        get { return canMove; }
+        set { canMove = value; }
+    }
+
+    public void ApplySlow(float slowMultiplier, float duration)
+    {
+        if (slowCoroutine != null)
+            StopCoroutine(slowCoroutine);
+        slowCoroutine = StartCoroutine(SlowDownRoutine(slowMultiplier, duration));
+    }
+
+    private IEnumerator SlowDownRoutine(float slowMultiplier, float duration)
+    {
+        moveSpeed *= slowMultiplier;
+        yield return new WaitForSeconds(duration);
+        moveSpeed = originalSpeed;
+        slowCoroutine = null;
+    }
+
+    private void Start()
+    {
+        originalSpeed = moveSpeed;
+    }
 
     private void Awake()
     {
@@ -52,8 +82,21 @@ public class PlayerController : MonoBehaviour
         HandleMovement();
     }
 
+    private void resetVelociyty()
+    {
+        Vector3 velocity = rb.linearVelocity;
+        velocity.x = 0f;
+        velocity.z = 0f;
+        rb.linearVelocity = velocity;
+    }
+
     private void HandleMovement()
     {
+        if (!canMove) {
+            resetVelociyty();
+            return;
+        }
+
         Vector3 moveDirection = (transform.forward * moveInput.y + transform.right * moveInput.x).normalized;
         Vector3 targetVelocity = moveDirection * moveSpeed;
         Vector3 currentVelocity = rb.linearVelocity;
@@ -65,6 +108,9 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
+        if (!canMove)
+            return;
+
         if (isGrounded)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
