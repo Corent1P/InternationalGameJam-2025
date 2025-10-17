@@ -4,7 +4,7 @@ using Unity.Netcode;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(NetworkObject))]
-public class NetworkPlayerController : NetworkBehaviour
+public abstract class NetworkPlayerController : NetworkBehaviour
 {
     [Header("Movement")]
     public float moveSpeed = 5f;
@@ -17,19 +17,19 @@ public class NetworkPlayerController : NetworkBehaviour
     [Header("Network")]
     public bool disableNonLocalCamera = true;
 
-    private Rigidbody rb;
+    protected Rigidbody rb;
+    protected Vector2 moveInput;
+    protected bool isGrounded = true;
+
     private PlayerInputs inputActions;
-    private Vector2 moveInput;
     private Vector2 lookInput;
     private float xRotation = 0f;
-    private bool isGrounded = true;
 
-    // Variables réseau pour synchroniser la position et rotation
     private NetworkVariable<Vector3> networkPosition = new NetworkVariable<Vector3>();
     private NetworkVariable<Quaternion> networkRotation = new NetworkVariable<Quaternion>();
     private NetworkVariable<float> networkCameraRotation = new NetworkVariable<float>();
 
-    private void Awake()
+    protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody>();
         inputActions = new PlayerInputs();
@@ -61,7 +61,7 @@ public class NetworkPlayerController : NetworkBehaviour
             {
                 Camera cam = cameraTransform.GetComponent<Camera>();
                 if (cam != null) cam.enabled = true;
-                
+
                 AudioListener listener = cameraTransform.GetComponent<AudioListener>();
                 if (listener != null) listener.enabled = true;
             }
@@ -110,7 +110,7 @@ public class NetworkPlayerController : NetworkBehaviour
         if (!IsOwner) return;
 
         HandleLook();
-        
+
         // Envoyer la position au serveur à chaque frame
         UpdateNetworkStateServerRpc(transform.position, transform.rotation, xRotation);
     }
@@ -122,7 +122,7 @@ public class NetworkPlayerController : NetworkBehaviour
         HandleMovement();
     }
 
-    private void HandleMovement()
+    protected virtual void HandleMovement()
     {
         Vector3 moveDirection = (transform.forward * moveInput.y + transform.right * moveInput.x).normalized;
         Vector3 targetVelocity = moveDirection * moveSpeed;
@@ -133,7 +133,7 @@ public class NetworkPlayerController : NetworkBehaviour
         rb.linearVelocity = targetVelocity;
     }
 
-    private void Jump()
+    protected virtual void Jump()
     {
         if (isGrounded)
         {
@@ -154,7 +154,7 @@ public class NetworkPlayerController : NetworkBehaviour
         {
             cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         }
-        
+
         transform.Rotate(Vector3.up * mouseX);
     }
 

@@ -2176,8 +2176,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lobbyManager: {fileID: 1279185765}
   lobbyWaitingUI: {fileID: 146039103}
-  playerListContainer: {fileID: 0}
-  playerListItemPrefab: {fileID: 0}
   startGameButton: {fileID: 2141435609}
   gameSceneName: Game
 --- !u!4 &773558854
