@@ -15,6 +15,7 @@ public class LobbyManager : MonoBehaviour
     private float heartbeatFrequency = 15f;
     public TMP_InputField inputFieldCode;
     public TMP_InputField inputFieldName;
+    public RelayManager relayManager;
 
     private async void Start()
     {
@@ -52,33 +53,38 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
-    public async void CreateLobby(string lobbyName, int maxPlayers = 4, bool IsPrivate = false, string gameMode = "Deathmatch", string map = "Arena")
+public async void CreateLobby(string lobbyName, int maxPlayers = 4, bool IsPrivate = false, string gameMode = "Deathmatch", string map = "Arena")
+{
+    try
     {
-        try
-        {
-            Player player = await GetPlayer(); // Await ici au lieu de .Result
+        Player player = await GetPlayer();
 
-            CreateLobbyOptions options = new CreateLobbyOptions
+        CreateLobbyOptions options = new CreateLobbyOptions
+        {
+            IsPrivate = IsPrivate,
+            Player = player,
+
+            Data = new Dictionary<string, DataObject>
             {
-                IsPrivate = IsPrivate,
-                Player = player,
+                { "GameMode", new DataObject(DataObject.VisibilityOptions.Public, gameMode) },
+                { "Map", new DataObject(DataObject.VisibilityOptions.Public, map) },
+                // 👇 AJOUTER CETTE LIGNE (pour initialiser le Relay Code)
+                { "RelayJoinCode", new DataObject(DataObject.VisibilityOptions.Member, "0") }
+            }
+        };
 
-                Data = new Dictionary<string, DataObject>
-                {
-                    { "GameMode", new DataObject(DataObject.VisibilityOptions.Public, gameMode) },
-                    { "Map", new DataObject(DataObject.VisibilityOptions.Public, map) }
-                }
-            };
-
-            hostLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
-            joinLobby = hostLobby;
-            Debug.Log("Party created: " + hostLobby.Name + " | Players: " + hostLobby.Players.Count + "/" + hostLobby.MaxPlayers + " | Lobby Code: " + hostLobby.LobbyCode);
-        }
-        catch (LobbyServiceException e)
-        {
-            Debug.LogException(e);
-        }
+        hostLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
+        joinLobby = hostLobby;
+        Debug.Log("Party created: " + hostLobby.Name + " | Players: " + hostLobby.Players.Count + "/" + hostLobby.MaxPlayers + " | Lobby Code: " + hostLobby.LobbyCode);
+        
+        // 👇 AJOUTER CETTE LIGNE
+        relayManager.ShowLobbyWaitingUI(true); // true = isHost
     }
+    catch (LobbyServiceException e)
+    {
+        Debug.LogException(e);
+    }
+}
 
     public async void CreateLobby()
     {
@@ -119,6 +125,7 @@ public class LobbyManager : MonoBehaviour
 
             joinLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode, options);
             Debug.Log("Joined lobby with code: " + lobbyCode);
+            PrintPlayers(joinLobby);
         }
         catch (LobbyServiceException e)
         {
@@ -134,7 +141,7 @@ public class LobbyManager : MonoBehaviour
             JoinLobbyByCode(inputFieldCode.text);
     }
 
-    public void PrintPlayer()
+    public void PrintPlayers()
     {
         PrintPlayers(hostLobby);
     }
