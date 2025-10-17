@@ -8,6 +8,7 @@ public class CandySpawner : MonoBehaviour
     public GameObject candyPrefab;
     public Transform spawnPoint;
     public float respawnCooldown = 10f;
+    public float launchForce = 3f;
 
     [Header("Interaction Settings")]
     public float interactionDistance = 3f;
@@ -61,8 +62,26 @@ public class CandySpawner : MonoBehaviour
         }
 
         currentCandy = Instantiate(candyPrefab, spawnPoint.position, spawnPoint.rotation);
+
+        Rigidbody rb = currentCandy.GetComponent<Rigidbody>();
+        if (rb == null) {
+            rb = currentCandy.AddComponent<Rigidbody>();
+        }
+
+        rb.useGravity = true;
+        rb.isKinematic = false;
+
+        Vector3 randomDirection = Vector3.up + new Vector3(
+            Random.Range(-0.2f, 0.2f),
+            0,
+            Random.Range(-0.2f, 0.2f)
+        );
+
+        rb.AddForce(randomDirection.normalized * launchForce, ForceMode.Impulse);
+
+
         isOnCooldown = false;
-        Debug.Log("🍬 Candy appeared!");
+        Debug.Log("🍬 Candy appeared with physics!");
     }
 
     private void CollectCandy() {
