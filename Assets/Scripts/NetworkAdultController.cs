@@ -1,14 +1,14 @@
 using UnityEngine;
 
+[RequireComponent(typeof(AdultManager))]
 public class NetworkAdultController : NetworkPlayerController
 {
-    void Start()
-    {
+    private AdultManager adultManager;
 
+    private void Awake() {
+        base.Awake();
+        adultManager = GetComponent<AdultManager>();
     }
 
-    void Update()
-    {
-
-    }
+    public AdultManager GetManager() => adultManager;
 }
