@@ -83,6 +83,7 @@ public class GameManager : NetworkBehaviour
             currentGameState.OnValueChanged += OnGameStateChanged;
             return;
         }
+
         Debug.Log("GameManager spawned on server.");
 
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
@@ -107,7 +108,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    private void OnDestroy()
+    private void  OnDestroy()
     {
         if (Instance == this)
         {
