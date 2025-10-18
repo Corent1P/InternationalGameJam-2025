@@ -11,14 +11,13 @@ GameObject:
   - component: {fileID: 4496892031640849448}
   - component: {fileID: 7891218516902114092}
   - component: {fileID: 9161354842402420208}
+  - component: {fileID: 1589839281656844463}
   - component: {fileID: 6863038676457982898}
   - component: {fileID: 5344770659794408433}
-  - component: {fileID: 5341641443148371578}
-  - component: {fileID: 8688685908189345729}
-  - component: {fileID: 6337961140825184470}
-  - component: {fileID: 1589839281656844463}
+  - component: {fileID: 549769019115032857}
+  - component: {fileID: 1139229214328420331}
   m_Layer: 0
-  m_Name: NetworkChildren
+  m_Name: NetworkAdult
   m_TagString: Child
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -73,7 +72,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 976d83099fd894bba8def3adc7524459, type: 2}
+  - {fileID: 2100000, guid: ad5ab0d69a15c462aade715efd72d087, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -96,6 +95,29 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!136 &1589839281656844463
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5012626422881075760}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &6863038676457982898
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -135,7 +157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2878265375
+  GlobalObjectIdHash: 1528970927
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -148,7 +170,7 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &5341641443148371578
+--- !u!114 &549769019115032857
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -157,16 +179,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 5012626422881075760}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a60cb6b91c9244e3b39dacda4066fd6, type: 3}
+  m_Script: {fileID: 11500000, guid: 100b0538dada94037a90dc93f9f09e24, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkAdultController
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 5
   jumpForce: 5
   mouseSensitivity: 2
   cameraTransform: {fileID: 2443032954063116551}
   disableNonLocalCamera: 1
---- !u!114 &8688685908189345729
+--- !u!114 &1139229214328420331
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -175,47 +197,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 5012626422881075760}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 690a4a466825a434da1fd8da470b3946, type: 3}
+  m_Script: {fileID: 11500000, guid: 7e0748cb13788482194a20605446a685, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
---- !u!114 &6337961140825184470
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5012626422881075760}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a41768c2399c043a58762760a05ecbf4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  maxCandies: 5
---- !u!136 &1589839281656844463
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5012626422881075760}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_EditorClassIdentifier: Assembly-CSharp::AdultManager
 --- !u!1 &5286102647677527768
 GameObject:
   m_ObjectHideFlags: 0

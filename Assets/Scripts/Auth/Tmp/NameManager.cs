@@ -18,7 +18,7 @@ public class NameManager : NetworkBehaviour
         string accountID = inputField.text;
         if (!string.IsNullOrEmpty(accountID))
         {
-            GameManager.Instance.RegisterPlayerServerRpc(accountID, NetworkManager.Singleton.LocalClientId);
+            GameManager5.Instance.RegisterPlayerServerRpc(accountID, NetworkManager.Singleton.LocalClientId);
             submitButton.interactable = false;
             inputField.interactable = false;
         }

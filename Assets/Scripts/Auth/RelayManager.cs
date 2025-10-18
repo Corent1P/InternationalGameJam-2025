@@ -21,7 +21,7 @@ public class RelayManager : MonoBehaviour
     public GameObject startGameButton; // Bouton Start (visible uniquement pour l'hôte)
 
     [Header("Game Settings")]
-    public string gameSceneName = "GameScene"; // Nom de votre scène de jeu
+    public string gameSceneName = "Game"; // Nom de votre scène de jeu
 
     private const string KEY_RELAY_JOIN_CODE = "RelayJoinCode";
     private float lobbyUpdateTimer;
@@ -191,11 +191,17 @@ public class RelayManager : MonoBehaviour
 
             // Démarrer l'hôte
             NetworkManager.Singleton.StartHost();
-            
+
             hasJoinedRelay = true;
+            PlayerPrefs.SetInt("MaxPlayers", lobbyManager.joinLobby.MaxPlayers);
 
             // Charger la scène de jeu
-            NetworkManager.Singleton.SceneManager.LoadScene(gameSceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
+            // NetworkManager.Singleton.SceneManager.LoadScene(gameSceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
+            var status = NetworkManager.Singleton.SceneManager.LoadScene(gameSceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
+            if (status != SceneEventProgressStatus.Started)
+            {
+                Debug.LogError($"Failed to load scene {gameSceneName}. Status: {status}");
+            }
 
             Debug.Log("Game started successfully!");
         }
