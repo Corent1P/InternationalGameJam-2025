@@ -62,8 +62,10 @@ MonoBehaviour:
       - rid: 479310511848554500
       - rid: 479310511848554501
       - rid: 479310511848554502
-      - rid: 3112889350854279168
-      - rid: 3112889350854279169
+      - rid: -2
+      - rid: -2
+      - rid: 6527245703894532096
+      - rid: 6527245703894532097
     m_RuntimeSettings:
       m_List: []
   m_AssetVersion: 8
@@ -161,7 +163,7 @@ MonoBehaviour:
         m_xrOcclusionMeshPS: {fileID: 4800000, guid: 4431b1f1f743fbf4eb310a967890cbea, type: 3}
         m_xrMirrorViewPS: {fileID: 4800000, guid: d5a307c014552314b9f560906d708772, type: 3}
         m_xrMotionVector: {fileID: 4800000, guid: f89aac1e4f84468418fe30e611dff395, type: 3}
-    - rid: 3112889350854279168
+    - rid: 6527245703894532096
       type: {class: PostProcessData/ShaderResources, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
       data:
         stopNanPS: {fileID: 4800000, guid: 1121bb4e615ca3c48b214e79e841e823, type: 3}
@@ -181,7 +183,7 @@ MonoBehaviour:
         uberPostPS: {fileID: 4800000, guid: e7857e9d0c934dc4f83f270f8447b006, type: 3}
         finalPostPassPS: {fileID: 4800000, guid: c49e63ed1bbcb334780a3bd19dfed403, type: 3}
         m_ShaderResourcesVersion: 0
-    - rid: 3112889350854279169
+    - rid: 6527245703894532097
       type: {class: PostProcessData/TextureResources, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
       data:
         blueNoise16LTex:
