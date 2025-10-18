@@ -21,7 +21,11 @@ public class LobbyManager : MonoBehaviour
 
     private async void Start()
     {
-        //await UnityServices.InitializeAsync();
+        // S'assurer que les services sont initialisés
+        if (UnityServices.State != ServicesInitializationState.Initialized)
+        {
+            await UnityServices.InitializeAsync();
+        }
     }
 
     private void Update()
@@ -55,39 +59,46 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
-public async void CreateLobby(string lobbyName, int maxPlayers = 4, bool IsPrivate = false, string gameMode = "Deathmatch", string map = "Arena")
-{
-    try
+    public async void CreateLobby(string lobbyName, int maxPlayers = 4, bool IsPrivate = false, string gameMode = "Deathmatch", string map = "Arena")
     {
-        Player player = await GetPlayer();
-
-        CreateLobbyOptions options = new CreateLobbyOptions
+        try
         {
-            IsPrivate = IsPrivate,
-            Player = player,
+            Player player = await GetPlayer();
 
-            Data = new Dictionary<string, DataObject>
+            CreateLobbyOptions options = new CreateLobbyOptions
             {
-                { "GameMode", new DataObject(DataObject.VisibilityOptions.Public, gameMode) },
-                { "Map", new DataObject(DataObject.VisibilityOptions.Public, map) },
-                // 👇 AJOUTER CETTE LIGNE (pour initialiser le Relay Code)
-                { "RelayJoinCode", new DataObject(DataObject.VisibilityOptions.Member, "0") }
-            }
-        };
+                IsPrivate = IsPrivate,
+                Player = player,
 
-        hostLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
-        joinLobby = hostLobby;
-        lobbyCodeText.text = "Lobby Code: " + joinLobby.LobbyCode;
-        Debug.Log("Party created: " + hostLobby.Name + " | Players: " + hostLobby.Players.Count + "/" + hostLobby.MaxPlayers + " | Lobby Code: " + hostLobby.LobbyCode);
-        
-        // 👇 AJOUTER CETTE LIGNE
-        relayManager.ShowLobbyWaitingUI(true); // true = isHost
+                Data = new Dictionary<string, DataObject>
+                {
+                    { "GameMode", new DataObject(DataObject.VisibilityOptions.Public, gameMode) },
+                    { "Map", new DataObject(DataObject.VisibilityOptions.Public, map) },
+                    { "RelayJoinCode", new DataObject(DataObject.VisibilityOptions.Member, "0") }
+                }
+            };
+
+            hostLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
+            joinLobby = hostLobby;
+            
+            if (lobbyCodeText != null)
+            {
+                lobbyCodeText.text = "Lobby Code: " + joinLobby.LobbyCode;
+            }
+            
+            Debug.Log("Party created: " + hostLobby.Name + " | Players: " + hostLobby.Players.Count + "/" + hostLobby.MaxPlayers + " | Lobby Code: " + hostLobby.LobbyCode);
+            
+            // Afficher l'UI d'attente pour l'hôte
+            if (relayManager != null)
+            {
+                relayManager.ShowLobbyWaitingUI(true);
+            }
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.LogException(e);
+        }
     }
-    catch (LobbyServiceException e)
-    {
-        Debug.LogException(e);
-    }
-}
 
     public async void CreateLobby()
     {
@@ -119,7 +130,7 @@ public async void CreateLobby(string lobbyName, int maxPlayers = 4, bool IsPriva
     {
         try
         {
-            Player player = await GetPlayer(); // Await ici au lieu de .Result
+            Player player = await GetPlayer();
 
             JoinLobbyByCodeOptions options = new JoinLobbyByCodeOptions
             {
@@ -129,6 +140,12 @@ public async void CreateLobby(string lobbyName, int maxPlayers = 4, bool IsPriva
             joinLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode, options);
             Debug.Log("Joined lobby with code: " + lobbyCode);
             PrintPlayers(joinLobby);
+            
+            // 🔥 AJOUT CRITIQUE : Afficher l'UI d'attente pour le client
+            if (relayManager != null)
+            {
+                relayManager.ShowLobbyWaitingUI(false); // false = n'est pas l'hôte
+            }
         }
         catch (LobbyServiceException e)
         {
@@ -151,15 +168,32 @@ public async void CreateLobby(string lobbyName, int maxPlayers = 4, bool IsPriva
 
     public void PrintPlayers(Lobby lobby)
     {
+        if (lobby == null) return;
+        
         foreach (Player player in lobby.Players)
         {
-            Debug.Log("Player ID: " + player.Id + " | Player Name: " + player.Data["PlayerName"].Value);
+            if (player.Data != null && player.Data.ContainsKey("PlayerName"))
+            {
+                Debug.Log("Player ID: " + player.Id + " | Player Name: " + player.Data["PlayerName"].Value);
+            }
         }
     }
 
     public async Task<Player> GetPlayer()
     {
-        var nickname = await AuthenticationService.Instance.GetPlayerNameAsync();
+        string nickname = "Player";
+        
+        try
+        {
+            if (AuthenticationService.Instance.IsSignedIn)
+            {
+                nickname = await AuthenticationService.Instance.GetPlayerNameAsync();
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning("Could not get player name: " + e.Message);
+        }
 
         return new Player
         {
@@ -168,5 +202,30 @@ public async void CreateLobby(string lobbyName, int maxPlayers = 4, bool IsPriva
                 { "PlayerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, nickname) }
             }
         };
+    }
+
+    // Méthode pour quitter proprement un lobby
+    public async void LeaveLobby()
+    {
+        try
+        {
+            if (joinLobby != null)
+            {
+                await LobbyService.Instance.RemovePlayerAsync(joinLobby.Id, AuthenticationService.Instance.PlayerId);
+                joinLobby = null;
+                hostLobby = null;
+                
+                if (relayManager != null)
+                {
+                    relayManager.HideLobbyWaitingUI();
+                }
+                
+                Debug.Log("Left lobby successfully");
+            }
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.LogException(e);
+        }
     }
 }
