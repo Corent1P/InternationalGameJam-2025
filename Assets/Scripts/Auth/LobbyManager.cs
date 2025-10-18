@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using TMPro;
+using UnityEngine.UI;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class LobbyManager : MonoBehaviour
     private float heartbeatFrequency = 15f;
     public TMP_InputField inputFieldCode;
     public TMP_InputField inputFieldName;
+    public TextMeshProUGUI lobbyCodeText;
     public RelayManager relayManager;
 
     private async void Start()
@@ -75,6 +77,7 @@ public async void CreateLobby(string lobbyName, int maxPlayers = 4, bool IsPriva
 
         hostLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
         joinLobby = hostLobby;
+        lobbyCodeText.text = "Lobby Code: " + joinLobby.LobbyCode;
         Debug.Log("Party created: " + hostLobby.Name + " | Players: " + hostLobby.Players.Count + "/" + hostLobby.MaxPlayers + " | Lobby Code: " + hostLobby.LobbyCode);
         
         // 👇 AJOUTER CETTE LIGNE
