@@ -188,6 +188,7 @@ MonoBehaviour:
   mouseSensitivity: 2
   cameraTransform: {fileID: 2443032954063116551}
   disableNonLocalCamera: 1
+  shopMenu: {fileID: 2557210085302142980, guid: 762e2098f70f2477d91b0ef1f6a34511, type: 3}
 --- !u!114 &1139229214328420331
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,6 +201,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e0748cb13788482194a20605446a685, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AdultManager
+  ShowTopMostFoldoutHeaderGroup: 1
+  maxInventorySize: 10
 --- !u!1 &5286102647677527768
 GameObject:
   m_ObjectHideFlags: 0
