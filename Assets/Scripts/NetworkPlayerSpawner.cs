@@ -21,7 +21,7 @@ public class NetworkPlayerSpawner : NetworkBehaviour
         ResetSpawnPoints();
     }
 
-    public void SpawnPlayerForClient(ulong clientId, Team team)
+    public GameObject SpawnPlayerForClient(ulong clientId, Team team)
     {
         // Obtenir une position de spawn
         Vector3 spawnPosition = GetSpawnPosition();
@@ -36,13 +36,14 @@ public class NetworkPlayerSpawner : NetworkBehaviour
         {
             Debug.LogError("Player prefab doesn't have a NetworkObject component!");
             Destroy(playerInstance);
-            return;
+            return null;
         }
 
         // Spawn le NetworkObject et lui assigner la propriété au client
         networkObject.SpawnAsPlayerObject(clientId, true);
 
         Debug.Log($"Player spawned for client {clientId} at position {spawnPosition}");
+        return playerInstance;
     }
 
     private Vector3 GetSpawnPosition()
