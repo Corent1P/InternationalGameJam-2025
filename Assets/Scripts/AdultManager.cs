@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
+using System.Collections.Generic;
 
 public class AdultManager : NetworkBehaviour
 {
@@ -8,6 +9,10 @@ public class AdultManager : NetworkBehaviour
 
     [Header("Game Phase")]
     private NetworkVariable<bool> isPreparationPhase = new NetworkVariable<bool>(true);
+
+    [Header("Inventory")]
+    public int maxInventorySize = 10;
+    private List<GameObject> inventory = new List<GameObject>();
 
     #region Coins Management
     public void SetCoins(int amount) {
@@ -30,7 +35,7 @@ public class AdultManager : NetworkBehaviour
             return;
         }
         coins.Value += amount;
-        Debug.Log($"Adult coins added ! Total: {coins.Value} (+{amount})");
+        Debug.Log($"Adult coins added! Total: {coins.Value} (+{amount})");
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -53,6 +58,107 @@ public class AdultManager : NetworkBehaviour
     }
 
     public int GetCoins() => coins.Value;
+    #endregion
+
+    #region Inventory Management
+    public bool AddItemToInventory(GameObject itemPrefab) {
+        if (!IsServer) {
+            Debug.LogWarning("AddItemToInventory can only be called on server!");
+            return false;
+        }
+
+        if (itemPrefab == null) {
+            Debug.LogWarning("Cannot add null item to inventory!");
+            return false;
+        }
+
+        if (inventory.Count >= maxInventorySize) {
+            Debug.Log($"Inventory full! ({inventory.Count}/{maxInventorySize})");
+            return false;
+        }
+
+        inventory.Add(itemPrefab);
+        Debug.Log($"✅ Added {itemPrefab.name} to inventory! ({inventory.Count}/{maxInventorySize})");
+        return true;
+    }
+
+    public bool RemoveItemFromInventory(int index) {
+        if (!IsServer) {
+            RemoveItemServerRpc(index);
+            return false;
+        }
+
+        if (index < 0 || index >= inventory.Count) {
+            Debug.LogWarning($"Invalid inventory index: {index}");
+            return false;
+        }
+
+        GameObject item = inventory[index];
+        inventory.RemoveAt(index);
+        Debug.Log($"❌ Removed {item.name} from inventory! ({inventory.Count}/{maxInventorySize})");
+        return true;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RemoveItemServerRpc(int index) {
+        RemoveItemFromInventory(index);
+    }
+
+    public GameObject GetItemAtIndex(int index) {
+        if (index < 0 || index >= inventory.Count) {
+            return null;
+        }
+        return inventory[index];
+    }
+
+    public int GetInventoryCount() => inventory.Count;
+
+    public List<GameObject> GetInventory() => new List<GameObject>(inventory);
+
+    public bool IsInventoryFull() => inventory.Count >= maxInventorySize;
+
+    public void PlaceTrap(int inventoryIndex, Vector3 position, Quaternion rotation) {
+        if (!IsServer) {
+            PlaceTrapServerRpc(inventoryIndex, position, rotation);
+            return;
+        }
+
+        GameObject trapPrefab = GetItemAtIndex(inventoryIndex);
+        if (trapPrefab == null) {
+            Debug.LogWarning($"No trap at index {inventoryIndex}");
+            return;
+        }
+
+        GameObject trap = Instantiate(trapPrefab, position, rotation);
+
+        NetworkObject networkObject = trap.GetComponent<NetworkObject>();
+        if (networkObject != null) {
+            networkObject.Spawn();
+        }
+
+        RemoveItemFromInventory(inventoryIndex);
+
+        Debug.Log($"🎯 Placed {trapPrefab.name} at {position}");
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlaceTrapServerRpc(int inventoryIndex, Vector3 position, Quaternion rotation) {
+        PlaceTrap(inventoryIndex, position, rotation);
+    }
+
+    public void ClearInventory() {
+        if (!IsServer) {
+            ClearInventoryServerRpc();
+            return;
+        }
+        inventory.Clear();
+        Debug.Log("🗑️ Inventory cleared!");
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ClearInventoryServerRpc() {
+        inventory.Clear();
+    }
     #endregion
 
     #region Game Phase
@@ -80,12 +186,14 @@ public class AdultManager : NetworkBehaviour
             return;
         }
         coins.Value = 0;
+        inventory.Clear();
         Debug.Log("Adult stats reset!");
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void ResetStatsServerRpc() {
         coins.Value = 0;
+        inventory.Clear();
     }
     #endregion
 }
