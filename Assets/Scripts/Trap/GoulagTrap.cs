@@ -11,6 +11,8 @@ public class GoulagTrap : TrapBase
     private List<NetworkChildrenController> trappedPlayers = new List<NetworkChildrenController>();
 
     protected override void ActivateTrap(NetworkChildrenController child) {
+        ChildrenManager manager = child.GetComponent<ChildrenManager>();
+
         if (goulagSpawnPoint == null) {
             Debug.LogWarning("No goulag spawn!");
             return;
@@ -24,6 +26,9 @@ public class GoulagTrap : TrapBase
         trappedPlayers.Add(child);
         child.transform.position = goulagSpawnPoint.position;
         child.transform.rotation = goulagSpawnPoint.rotation;
+
+        if (manager != null)
+            manager.SetCaught(true);
 
         Debug.Log($"{child.name} has been sent to the goulag!");
     }
@@ -42,6 +47,11 @@ public class GoulagTrap : TrapBase
                 child.transform.position = releaseSpawnPoint.position;
                 child.transform.rotation = releaseSpawnPoint.rotation;
             }
+
+            ChildrenManager manager = child.GetComponent<ChildrenManager>();
+
+            if (manager != null)
+                manager.ResetCaughtStatus();
 
             Debug.Log($"{child.name} is now free!");
         }
