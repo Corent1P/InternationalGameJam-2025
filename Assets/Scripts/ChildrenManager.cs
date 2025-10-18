@@ -66,4 +66,11 @@ public class ChildrenManager : NetworkBehaviour
     public int GetCandyCount() => currentCandies.Value;
     public int GetMaxCandies() => maxCandies;
     public bool IsCandyFull() => currentCandies.Value >= maxCandies;
+
+
+    public void SetCoins(int amount) {}
+    public int getCandy() { return 0; }
+    public int getNumberCaught() { return 0; }
+    public bool isCaught() { return false; }
+    public void SetPreparationPhase(bool isPhase) {}
 }

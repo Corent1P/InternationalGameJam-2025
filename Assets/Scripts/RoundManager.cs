@@ -67,7 +67,7 @@ public class RoundManager : NetworkBehaviour
         {
             if (child != null)
             {
-                child.GetComponent<ChildManager>().SetPreparationPhase(true);
+                child.GetComponent<ChildrenManager>().SetPreparationPhase(true);
             }
         }
 
@@ -104,7 +104,7 @@ public class RoundManager : NetworkBehaviour
         {
             if (child != null)
             {
-                child.GetComponent<ChildManager>().SetPreparationPhase(false);
+                child.GetComponent<ChildrenManager>().SetPreparationPhase(false);
             }
         }
 
@@ -195,7 +195,7 @@ public class RoundManager : NetworkBehaviour
         // L'adulte gagne si tous les enfants sont attrapés
         foreach (var child in childPlayers)
         {
-            if (child != null && !child.GetComponent<ChildManager>().isCaught())
+            if (child != null && !child.GetComponent<ChildrenManager>().isCaught())
             {
                 return false;
             }

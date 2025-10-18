@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
 using System.Collections;
+using Unity.Services.Matchmaker.Models;
 
 public enum Team
 {
@@ -18,20 +19,6 @@ public enum GameState
     GameEnd
 }
 
-public class AdultManager
-{
-    public void SetCoins(int amount) {}
-    public void SetPreparationPhase(bool isPhase) {}
-}
-public class ChildManager
-{
-    public void SetCoins(int amount) {}
-    public int getCandy() { return 0; }
-    public int getNumberCaught() { return 0; }
-    public bool isCaught() { return false; }
-    public void SetPreparationPhase(bool isPhase) {}
-}
-
 public class GameManager : NetworkBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -39,6 +26,7 @@ public class GameManager : NetworkBehaviour
     [Header("References")]
     [SerializeField] private NetworkPlayerSpawner playerSpawner;
     [SerializeField] private RoundManager roundManager;
+    [SerializeField] private GameObject temporaryCamera;
 
     [Header("Game Data")]
     public Dictionary<ulong, PlayerData> playerStatesByID = new();
@@ -108,8 +96,10 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    private void  OnDestroy()
+    public override void OnDestroy()
     {
+        base.OnDestroy();
+    
         if (Instance == this)
         {
             Instance = null;
@@ -152,6 +142,7 @@ public class GameManager : NetworkBehaviour
 
         Debug.Log($"Spawning {allClients.Count} players. Adult index: {adultIndex}");
 
+        DisableTemporaryCameraClientRpc();
         for (int i = 0; i < allClients.Count; i++)
         {
             Team team = (i == adultIndex) ? Team.Adults : Team.Children;
@@ -162,12 +153,10 @@ public class GameManager : NetworkBehaviour
                 if (team == Team.Adults)
                 {
                     roundManager.SetAdultPlayer(go);
-                    adultPlayer = go.GetComponent<AdultManager>();
                     Debug.Log($"Adult player assigned (Client {allClients[i]})");
                 }
                 else
                 {
-                    ChildManager child = go.GetComponent<ChildManager>();
                     childPlayers.Add(go);
                     Debug.Log($"Child player added (Client {allClients[i]})");
                 }
@@ -190,7 +179,6 @@ public class GameManager : NetworkBehaviour
 
             if (go != null)
             {
-                ChildManager child = go.GetComponent<ChildManager>();
                 childPlayers.Add(go);
                 roundManager.SetChildPlayers(childPlayers);
             }
@@ -333,8 +321,8 @@ public class GameManager : NetworkBehaviour
             {
                 if (child != null)
                 {
-                    coinsEarned -= child.GetComponent<ChildManager>().getCandy() * 10;
-                    coinsEarned += child.GetComponent<ChildManager>().getNumberCaught() * 50;
+                    coinsEarned -= child.GetComponent<ChildrenManager>().getCandy() * 10;
+                    coinsEarned += child.GetComponent<ChildrenManager>().getNumberCaught() * 50;
                 }
             }
 
@@ -358,14 +346,14 @@ public class GameManager : NetworkBehaviour
             {
                 if (child != null)
                 {
-                    int coinsEarned = numberRounds * 50 + child.GetComponent<ChildManager>().getCandy() * 20;
+                    int coinsEarned = numberRounds * 50 + child.GetComponent<ChildrenManager>().getCandy() * 20;
 
                     if (hasBeenFinishedEarlier)
                     {
                         coinsEarned /= 2;
                     }
 
-                    child.GetComponent<ChildManager>().SetCoins(coinsEarned);
+                    child.GetComponent<ChildrenManager>().SetCoins(coinsEarned);
                     Debug.Log($"Child earned {coinsEarned} coins");
                 }
             }
@@ -408,6 +396,16 @@ public class GameManager : NetworkBehaviour
     {
         Debug.Log($"[CLIENT] Game state changed: {oldState} -> {newState}");
         // Réagir aux changements d'état côté client
+    }
+
+    [ClientRpc]
+    private void DisableTemporaryCameraClientRpc()
+    {
+        if (temporaryCamera != null)
+        {
+            temporaryCamera.SetActive(false);
+            Debug.Log("[CLIENT] Temporary camera disabled");
+        }
     }
 
     #endregion
