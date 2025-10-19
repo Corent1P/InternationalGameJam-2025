@@ -6,6 +6,7 @@ public class AdultManager : NetworkBehaviour
 {
     [Header("Game Stats")]
     private NetworkVariable<int> coins = new NetworkVariable<int>(0);
+    private NetworkVariable<int> childrenCaught = new NetworkVariable<int>(0);
 
     [Header("Game Phase")]
     private NetworkVariable<bool> isPreparationPhase = new NetworkVariable<bool>(true);
@@ -15,8 +16,10 @@ public class AdultManager : NetworkBehaviour
     private List<GameObject> inventory = new List<GameObject>();
 
     #region Coins Management
-    public void SetCoins(int amount) {
-        if (!IsServer) {
+    public void SetCoins(int amount)
+    {
+        if (!IsServer)
+        {
             SetCoinsServerRpc(amount);
             return;
         }
@@ -25,12 +28,15 @@ public class AdultManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SetCoinsServerRpc(int amount) {
+    private void SetCoinsServerRpc(int amount)
+    {
         coins.Value = Mathf.Max(0, amount);
     }
 
-    public void AddCoins(int amount) {
-        if (!IsServer) {
+    public void AddCoins(int amount)
+    {
+        if (!IsServer)
+        {
             AddCoinsServerRpc(amount);
             return;
         }
@@ -39,12 +45,15 @@ public class AdultManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void AddCoinsServerRpc(int amount) {
+    private void AddCoinsServerRpc(int amount)
+    {
         coins.Value += amount;
     }
 
-    public void RemoveCoins(int amount) {
-        if (!IsServer) {
+    public void RemoveCoins(int amount)
+    {
+        if (!IsServer)
+        {
             RemoveCoinsServerRpc(amount);
             return;
         }
@@ -53,26 +62,52 @@ public class AdultManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void RemoveCoinsServerRpc(int amount) {
+    private void RemoveCoinsServerRpc(int amount)
+    {
         coins.Value = Mathf.Max(0, coins.Value - amount);
     }
 
     public int GetCoins() => coins.Value;
     #endregion
 
+    #region Children Caught Stats
+    public void IncrementChildrenCaught()
+    {
+        if (!IsServer)
+        {
+            IncrementChildrenCaughtServerRpc();
+            return;
+        }
+        childrenCaught.Value++;
+        Debug.Log($"Total children caught: {childrenCaught.Value}");
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void IncrementChildrenCaughtServerRpc()
+    {
+        childrenCaught.Value++;
+    }
+
+    public int GetChildrenCaught() => childrenCaught.Value;
+    #endregion
+
     #region Inventory Management
-    public bool AddItemToInventory(GameObject itemPrefab) {
-        if (!IsServer) {
+    public bool AddItemToInventory(GameObject itemPrefab)
+    {
+        if (!IsServer)
+        {
             Debug.LogWarning("AddItemToInventory can only be called on server!");
             return false;
         }
 
-        if (itemPrefab == null) {
+        if (itemPrefab == null)
+        {
             Debug.LogWarning("Cannot add null item to inventory!");
             return false;
         }
 
-        if (inventory.Count >= maxInventorySize) {
+        if (inventory.Count >= maxInventorySize)
+        {
             Debug.Log($"Inventory full! ({inventory.Count}/{maxInventorySize})");
             return false;
         }
@@ -82,13 +117,16 @@ public class AdultManager : NetworkBehaviour
         return true;
     }
 
-    public bool RemoveItemFromInventory(int index) {
-        if (!IsServer) {
+    public bool RemoveItemFromInventory(int index)
+    {
+        if (!IsServer)
+        {
             RemoveItemServerRpc(index);
             return false;
         }
 
-        if (index < 0 || index >= inventory.Count) {
+        if (index < 0 || index >= inventory.Count)
+        {
             Debug.LogWarning($"Invalid inventory index: {index}");
             return false;
         }
@@ -100,12 +138,15 @@ public class AdultManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void RemoveItemServerRpc(int index) {
+    private void RemoveItemServerRpc(int index)
+    {
         RemoveItemFromInventory(index);
     }
 
-    public GameObject GetItemAtIndex(int index) {
-        if (index < 0 || index >= inventory.Count) {
+    public GameObject GetItemAtIndex(int index)
+    {
+        if (index < 0 || index >= inventory.Count)
+        {
             return null;
         }
         return inventory[index];
@@ -117,14 +158,17 @@ public class AdultManager : NetworkBehaviour
 
     public bool IsInventoryFull() => inventory.Count >= maxInventorySize;
 
-    public void PlaceTrap(int inventoryIndex, Vector3 position, Quaternion rotation) {
-        if (!IsServer) {
+    public void PlaceTrap(int inventoryIndex, Vector3 position, Quaternion rotation)
+    {
+        if (!IsServer)
+        {
             PlaceTrapServerRpc(inventoryIndex, position, rotation);
             return;
         }
 
         GameObject trapPrefab = GetItemAtIndex(inventoryIndex);
-        if (trapPrefab == null) {
+        if (trapPrefab == null)
+        {
             Debug.LogWarning($"No trap at index {inventoryIndex}");
             return;
         }
@@ -132,7 +176,8 @@ public class AdultManager : NetworkBehaviour
         GameObject trap = Instantiate(trapPrefab, position, rotation);
 
         NetworkObject networkObject = trap.GetComponent<NetworkObject>();
-        if (networkObject != null) {
+        if (networkObject != null)
+        {
             networkObject.Spawn();
         }
 
@@ -142,12 +187,15 @@ public class AdultManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void PlaceTrapServerRpc(int inventoryIndex, Vector3 position, Quaternion rotation) {
+    private void PlaceTrapServerRpc(int inventoryIndex, Vector3 position, Quaternion rotation)
+    {
         PlaceTrap(inventoryIndex, position, rotation);
     }
 
-    public void ClearInventory() {
-        if (!IsServer) {
+    public void ClearInventory()
+    {
+        if (!IsServer)
+        {
             ClearInventoryServerRpc();
             return;
         }
@@ -156,14 +204,17 @@ public class AdultManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void ClearInventoryServerRpc() {
+    private void ClearInventoryServerRpc()
+    {
         inventory.Clear();
     }
     #endregion
 
     #region Game Phase
-    public void SetPreparationPhase(bool isPhase) {
-        if (!IsServer) {
+    public void SetPreparationPhase(bool isPhase)
+    {
+        if (!IsServer)
+        {
             SetPreparationPhaseServerRpc(isPhase);
             return;
         }
@@ -172,7 +223,8 @@ public class AdultManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SetPreparationPhaseServerRpc(bool isPhase) {
+    private void SetPreparationPhaseServerRpc(bool isPhase)
+    {
         isPreparationPhase.Value = isPhase;
     }
 
@@ -180,19 +232,24 @@ public class AdultManager : NetworkBehaviour
     #endregion
 
     #region Reset & Utility
-    public void ResetStats() {
-        if (!IsServer) {
+    public void ResetStats()
+    {
+        if (!IsServer)
+        {
             ResetStatsServerRpc();
             return;
         }
         coins.Value = 0;
+        childrenCaught.Value = 0;
         inventory.Clear();
         Debug.Log("Adult stats reset!");
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void ResetStatsServerRpc() {
+    private void ResetStatsServerRpc()
+    {
         coins.Value = 0;
+        childrenCaught.Value = 0;
         inventory.Clear();
     }
     #endregion

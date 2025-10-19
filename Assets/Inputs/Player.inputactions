@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "Player",
     "maps": [
         {
@@ -27,6 +28,15 @@
                     "name": "Jump",
                     "type": "Button",
                     "id": "2f114a37-aafa-4db1-bb9f-25518c638aab",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Interact",
+                    "type": "Button",
+                    "id": "153e4273-ca9e-4b72-8149-8a56755295dd",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -163,6 +173,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c47d289c-c878-4fea-861b-07acfb8a7aaf",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1267adfe-5e9b-49e0-a86e-36f0e870e211",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

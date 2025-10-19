@@ -16,9 +16,10 @@ GameObject:
   - component: {fileID: 5344770659794408433}
   - component: {fileID: 549769019115032857}
   - component: {fileID: 1139229214328420331}
+  - component: {fileID: 508841522827383123}
   m_Layer: 0
   m_Name: NetworkAdult
-  m_TagString: Child
+  m_TagString: Adult
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -155,8 +156,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   GlobalObjectIdHash: 1528970927
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
@@ -180,7 +181,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 100b0538dada94037a90dc93f9f09e24, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NetworkAdultController
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 5
@@ -199,10 +200,57 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7e0748cb13788482194a20605446a685, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AdultManager
   ShowTopMostFoldoutHeaderGroup: 1
   maxInventorySize: 10
+--- !u!114 &508841522827383123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5012626422881075760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ef1a66cf34747edbf476bd37d0b490, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AdultCatchSystem
+  ShowTopMostFoldoutHeaderGroup: 1
+  dashDistance: 5
+  dashDuration: 0.3
+  dashCooldown: 2
+  dashCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  catchRadius: 1.5
+  childrenLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  coinsReward: 10
+  dashEffect: {fileID: 0}
+  catchEffect: {fileID: 0}
 --- !u!1 &5286102647677527768
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,8 +354,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_RenderShadows: 1
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
