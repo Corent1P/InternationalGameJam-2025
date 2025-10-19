@@ -74,7 +74,7 @@ public class AdultCatchSystem : NetworkBehaviour
     {
         if (!IsOwner) return;
         if (isDashing) return;
-        
+
         // Vérifier le cooldown
         if (Time.time - lastDashTime < dashCooldown)
         {
@@ -105,6 +105,18 @@ public class AdultCatchSystem : NetworkBehaviour
     private void PerformDashClientRpc(Vector3 startPos, Vector3 direction)
     {
         if (isDashing) return;
+        
+        // Déclencher l'animation de catch au début du dash
+        NetworkAdultController adultController = GetComponent<NetworkAdultController>();
+        if (adultController != null)
+        {
+            adultController.TriggerCatchAnimation();
+            Debug.Log($"[AdultCatchSystem] Catch animation triggered in PerformDashClientRpc");
+        }
+        else
+        {
+            Debug.LogError($"[AdultCatchSystem] NetworkAdultController NOT FOUND!");
+        }
         
         StartCoroutine(DashCoroutine(startPos, direction));
     }
@@ -249,9 +261,6 @@ public class AdultCatchSystem : NetworkBehaviour
 
         // Récompenser l'adulte
         adultManager.AddCoins(coinsReward);
-
-        // Déclencher l'animation de catch sur tous les clients
-        TriggerCatchAnimationClientRpc();
 
         // Effet visuel de catch sur tous les clients
         PlayCatchEffectClientRpc(child.NetworkObjectId);
