@@ -65,9 +65,10 @@ public class ShopRadialMenu : MonoBehaviour
         for (int i = 0; i < shopItems.Count; i++)
         {
             GameObject btnObj = Instantiate(itemButtonPrefab, itemsContainer);
-            RectTransform rect = btnObj.GetComponent<RectTransform>();
-            float angle = i * angleStep * Mathf.Deg2Rad;
-            rect.anchoredPosition = new(Mathf.Sin(angle) * selectionRadius, Mathf.Cos(angle) * selectionRadius);
+            btnObj.name = $"ShopItemButton_{shopItems[i].itemName}";
+            btnObj.transform.localScale = Vector3.one;
+            btnObj.transform.localPosition = new Vector3(-240, 200 - i * 80, 0);
+            btnObj.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -i * 80);
 
             ShopItemButton btn = btnObj.GetComponent<ShopItemButton>();
             if (btn != null)
