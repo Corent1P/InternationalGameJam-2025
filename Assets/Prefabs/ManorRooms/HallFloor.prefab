@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1882681312332434950, guid: 46b7edabea20c477e9ba8cd5a84edea1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -36.264492
+      value: -34.75473
       objectReference: {fileID: 0}
     - target: {fileID: 1882681312332434950, guid: 46b7edabea20c477e9ba8cd5a84edea1, type: 3}
       propertyPath: m_LocalPosition.y
@@ -18,7 +18,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1882681312332434950, guid: 46b7edabea20c477e9ba8cd5a84edea1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 26.254923
+      value: -4.7422543
       objectReference: {fileID: 0}
     - target: {fileID: 1882681312332434950, guid: 46b7edabea20c477e9ba8cd5a84edea1, type: 3}
       propertyPath: m_LocalRotation.w
@@ -50,7 +50,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4433102013263991010, guid: 46b7edabea20c477e9ba8cd5a84edea1, type: 3}
       propertyPath: m_Name
-      value: Hall no floor Variant
+      value: HallFloor
+      objectReference: {fileID: 0}
+    - target: {fileID: 6692134016069729576, guid: 46b7edabea20c477e9ba8cd5a84edea1, type: 3}
+      propertyPath: m_Size.y
+      value: 1.4363272
+      objectReference: {fileID: 0}
+    - target: {fileID: 6692134016069729576, guid: 46b7edabea20c477e9ba8cd5a84edea1, type: 3}
+      propertyPath: m_Center.y
+      value: 2.8335805
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
