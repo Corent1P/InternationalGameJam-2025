@@ -61,10 +61,10 @@ PrefabInstance:
       addedObject: {fileID: -804240278483625936}
     - targetCorrespondingSourceObject: {fileID: 3361415967608448148, guid: c66a350aaea42434ebbe764ff712de12, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5916886808859144414}
+      addedObject: {fileID: 8818379608930662705}
     - targetCorrespondingSourceObject: {fileID: 3361415967608448148, guid: c66a350aaea42434ebbe764ff712de12, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8818379608930662705}
+      addedObject: {fileID: 5916886808859144414}
   m_SourcePrefab: {fileID: 100100000, guid: c66a350aaea42434ebbe764ff712de12, type: 3}
 --- !u!1 &5495674486607559409 stripped
 GameObject:
@@ -81,7 +81,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 793dca6f95bbf491eb014f83b6d3bd3e, type: 3}
+  m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 793dca6f95bbf491eb014f83b6d3bd3e, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.539
@@ -168,6 +168,31 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &8818379608930662705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5495674486607559409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 487102611
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &5916886808859144414
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,28 +211,3 @@ MonoBehaviour:
   triggerSound: {fileID: 8300000, guid: 793dca6f95bbf491eb014f83b6d3bd3e, type: 3}
   volume: 0.658
   playOnce: 0
---- !u!114 &8818379608930662705
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5495674486607559409}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 0
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  DeferredDespawnTick: 0
-  Ownership: 1
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0

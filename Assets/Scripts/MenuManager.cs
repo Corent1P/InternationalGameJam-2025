@@ -90,4 +90,20 @@ public class MenuManager : MonoBehaviour
         authMenu.SetActive(false);
         hostMenu.SetActive(true);
     }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    public void HideAllMenus()
+    {
+        mainMenu.SetActive(false);
+        optionsMenu.SetActive(false);
+        playMenu.SetActive(false);
+        joinMenu.SetActive(false);
+        hostMenu.SetActive(false);
+        usernameMenu.SetActive(false);
+        authMenu.SetActive(false);
+    }
 }
