@@ -124,16 +124,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c0d0664058794ab4b1e813a69486f5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShopRadialMenu
+  ShowTopMostFoldoutHeaderGroup: 1
   radialMenuPanel: {fileID: 2307886525225880451}
   itemsContainer: {fileID: 1599378454899191557}
   itemButtonPrefab: {fileID: 2297171592639472429}
   shopKey: 98
   selectionRadius: 150
   shopItems:
-  - itemName: Test
-    price: 100
-  - itemName: Coucou
-    price: 10
+  - itemName: Paralisys
+    price: 0
+    itemPrefab: {fileID: 3310954310743593055, guid: 260654610409d4e8fbf7dbd15688b26e, type: 3}
+  - itemName: Gulag
+    price: 1
+    itemPrefab: {fileID: 3468597561850981788, guid: 4cb9bdac258194c2cac1c151c73367a7, type: 3}
 --- !u!1 &5115277345681318212
 GameObject:
   m_ObjectHideFlags: 0
@@ -281,6 +284,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1599378454899191557}
     m_Modifications:
+    - target: {fileID: -9114676877954335841, guid: 0afa7c94918924b9c86f9f9875ebddec, type: 3}
+      propertyPath: button
+      value: 
+      objectReference: {fileID: 5549411193410567860}
     - target: {fileID: 3755915915305639242, guid: 0afa7c94918924b9c86f9f9875ebddec, type: 3}
       propertyPath: m_text
       value: 
@@ -388,3 +395,14 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 9132886599108557585, guid: 0afa7c94918924b9c86f9f9875ebddec, type: 3}
   m_PrefabInstance: {fileID: 7016527530810054716}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5549411193410567860 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3196656924296652424, guid: 0afa7c94918924b9c86f9f9875ebddec, type: 3}
+  m_PrefabInstance: {fileID: 7016527530810054716}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2297171592639472429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button

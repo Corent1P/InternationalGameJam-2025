@@ -160,37 +160,91 @@ public class AdultManager : NetworkBehaviour
 
     public void PlaceTrap(int inventoryIndex, Vector3 position, Quaternion rotation)
     {
+        // Si c'est un client, on envoie la requête au serveur
         if (!IsServer)
         {
             PlaceTrapServerRpc(inventoryIndex, position, rotation);
             return;
         }
 
+        // Serveur : on instancie et on spawn
         GameObject trapPrefab = GetItemAtIndex(inventoryIndex);
         if (trapPrefab == null)
         {
-            Debug.LogWarning($"No trap at index {inventoryIndex}");
+            Debug.LogWarning($"[AdultManager] Aucun piège à l'index {inventoryIndex}");
             return;
         }
 
-        GameObject trap = Instantiate(trapPrefab, position, rotation);
-
-        NetworkObject networkObject = trap.GetComponent<NetworkObject>();
-        if (networkObject != null)
+        // Important : vérifier que le prefab est bien enregistré dans NetworkManager
+        NetworkObject prefabNetObj = trapPrefab.GetComponent<NetworkObject>();
+        if (prefabNetObj == null)
         {
-            networkObject.Spawn();
+            Debug.LogError($"[AdultManager] Le prefab '{trapPrefab.name}' n’a pas de NetworkObject !");
+            return;
         }
 
+        // Instancier le piège côté serveur
+        GameObject trapInstance = Instantiate(trapPrefab, position, rotation);
+
+        // Obtenir son NetworkObject et le propager à tous les clients
+        NetworkObject netObj = trapInstance.GetComponent<NetworkObject>();
+        if (netObj != null)
+        {
+            netObj.Spawn(true); // true => visible par tous les clients
+            Debug.Log($"[AdultManager] Spawned trap '{trapPrefab.name}' for all clients.");
+        }
+        else
+        {
+            Debug.LogError("[AdultManager] Le piège instancié n’a pas de NetworkObject !");
+        }
+
+        // Retirer l’objet de l’inventaire
         RemoveItemFromInventory(inventoryIndex);
 
-        Debug.Log($"🎯 Placed {trapPrefab.name} at {position}");
+        Debug.Log($"🎯 {trapPrefab.name} placé à {position}");
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void PlaceTrapServerRpc(int inventoryIndex, Vector3 position, Quaternion rotation)
     {
+        // Exécute la logique serveur
         PlaceTrap(inventoryIndex, position, rotation);
     }
+
+
+    // public void PlaceTrap(int inventoryIndex, Vector3 position, Quaternion rotation)
+    // {
+    //     if (!IsServer)
+    //     {
+    //         PlaceTrapServerRpc(inventoryIndex, position, rotation);
+    //         return;
+    //     }
+
+    //     GameObject trapPrefab = GetItemAtIndex(inventoryIndex);
+    //     if (trapPrefab == null)
+    //     {
+    //         Debug.LogWarning($"No trap at index {inventoryIndex}");
+    //         return;
+    //     }
+
+    //     GameObject trap = Instantiate(trapPrefab, position, rotation);
+
+    //     NetworkObject networkObject = trap.GetComponent<NetworkObject>();
+    //     if (networkObject != null)
+    //     {
+    //         networkObject.Spawn();
+    //     }
+
+    //     RemoveItemFromInventory(inventoryIndex);
+
+    //     Debug.Log($"🎯 Placed {trapPrefab.name} at {position}");
+    // }
+
+    // [ServerRpc(RequireOwnership = false)]
+    // private void PlaceTrapServerRpc(int inventoryIndex, Vector3 position, Quaternion rotation)
+    // {
+    //     PlaceTrap(inventoryIndex, position, rotation);
+    // }
 
     public void ClearInventory()
     {
