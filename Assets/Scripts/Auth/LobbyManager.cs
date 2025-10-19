@@ -14,9 +14,12 @@ public class LobbyManager : MonoBehaviour
     public Lobby joinLobby;
     private float heartbeatTimer;
     private float heartbeatFrequency = 15f;
+    public MenuManager menuManager;
     public TMP_InputField inputFieldCode;
     public TMP_InputField inputFieldName;
     public TextMeshProUGUI lobbyCodeText;
+    public TextMeshProUGUI joinErrorText;
+    public TextMeshProUGUI joinSuccessText;
     public RelayManager relayManager;
 
     private async void Start()
@@ -87,12 +90,12 @@ public class LobbyManager : MonoBehaviour
             }
             
             Debug.Log("Party created: " + hostLobby.Name + " | Players: " + hostLobby.Players.Count + "/" + hostLobby.MaxPlayers + " | Lobby Code: " + hostLobby.LobbyCode);
-            
+
             // Afficher l'UI d'attente pour l'hôte
             if (relayManager != null)
-            {
                 relayManager.ShowLobbyWaitingUI(true);
-            }
+            if (menuManager != null)
+                menuManager.HideAllMenus();
         }
         catch (LobbyServiceException e)
         {
@@ -140,15 +143,19 @@ public class LobbyManager : MonoBehaviour
             joinLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode, options);
             Debug.Log("Joined lobby with code: " + lobbyCode);
             PrintPlayers(joinLobby);
-            
+            joinErrorText.gameObject.SetActive(false);
+            joinSuccessText.gameObject.SetActive(true);
+
             // 🔥 AJOUT CRITIQUE : Afficher l'UI d'attente pour le client
             if (relayManager != null)
-            {
                 relayManager.ShowLobbyWaitingUI(false); // false = n'est pas l'hôte
-            }
+            if (menuManager != null)
+                menuManager.HideAllMenus();
         }
         catch (LobbyServiceException e)
         {
+            joinSuccessText.gameObject.SetActive(false);
+            joinErrorText.gameObject.SetActive(true);
             Debug.LogException(e);
         }
     }

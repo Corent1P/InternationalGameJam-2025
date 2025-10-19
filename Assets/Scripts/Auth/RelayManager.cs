@@ -19,6 +19,7 @@ public class RelayManager : MonoBehaviour
     // public Transform playerListContainer; // Container pour la liste des joueurs
     // public GameObject playerListItemPrefab; // Prefab pour afficher un joueur
     public GameObject startGameButton; // Bouton Start (visible uniquement pour l'hôte)
+    public TextMeshProUGUI lobbyInfoText;
 
     [Header("Game Settings")]
     public string gameSceneName = "Game"; // Nom de votre scène de jeu
@@ -95,7 +96,7 @@ public class RelayManager : MonoBehaviour
     public void ShowLobbyWaitingUI(bool isHostPlayer)
     {
         isHost = isHostPlayer;
-        
+
         if (lobbyWaitingUI != null)
             lobbyWaitingUI.SetActive(true);
 
@@ -129,7 +130,7 @@ public class RelayManager : MonoBehaviour
         // {
         //     GameObject playerItem = Instantiate(playerListItemPrefab, playerListContainer);
         //     TMP_Text playerNameText = playerItem.GetComponentInChildren<TMP_Text>();
-            
+
         //     if (playerNameText != null && player.Data.ContainsKey("PlayerName"))
         //     {
         //         playerNameText.text = player.Data["PlayerName"].Value;
@@ -137,6 +138,13 @@ public class RelayManager : MonoBehaviour
         // }
 
         // Afficher le nombre de joueurs 
+        if (lobbyInfoText != null)
+        {
+            int currentPlayers = lobbyManager.joinLobby != null ? lobbyManager.joinLobby.Players.Count : 0;
+            int maxPlayers = lobbyManager.joinLobby != null ? lobbyManager.joinLobby.MaxPlayers : 0;
+            string lobbyName = lobbyManager.joinLobby != null ? lobbyManager.joinLobby.Name : "N/A";
+            lobbyInfoText.text = $"Lobby Name: {lobbyName}\nPlayers: {currentPlayers}/{maxPlayers}";
+        }
         Debug.Log($"Players in lobby: {lobbyManager.joinLobby.Players.Count}/{lobbyManager.joinLobby.MaxPlayers}");
     }
 
