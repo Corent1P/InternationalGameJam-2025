@@ -3103,7 +3103,7 @@ MonoBehaviour:
   lobbyWaitingUI: {fileID: 146039103}
   startGameButton: {fileID: 2141435609}
   lobbyInfoText: {fileID: 1479298102}
-  gameSceneName: Game
+  gameSceneName: Game-Procedural
 --- !u!4 &773558854
 Transform:
   m_ObjectHideFlags: 0
