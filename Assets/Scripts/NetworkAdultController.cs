@@ -60,6 +60,36 @@ public class NetworkAdultController : NetworkPlayerController
         }
     }
 
+    // Méthode pour déclencher l'animation de catch/dash
+    public void TriggerCatchAnimation()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger("Catch");
+            Debug.Log($"[NetworkAdultController] Catch trigger activated on animator: {animator.name}");
+            
+            // Vérifier si le trigger existe
+            bool hasCatchTrigger = false;
+            foreach (var param in animator.parameters)
+            {
+                if (param.name == "Catch" && param.type == AnimatorControllerParameterType.Trigger)
+                {
+                    hasCatchTrigger = true;
+                    break;
+                }
+            }
+            
+            if (!hasCatchTrigger)
+            {
+                Debug.LogError($"[NetworkAdultController] Trigger 'Catch' NOT FOUND in Animator parameters!");
+            }
+        }
+        else
+        {
+            Debug.LogError($"[NetworkAdultController] Animator is NULL!");
+        }
+    }
+
     protected override void HandleMovement()
     {
         if (IsOwner)
