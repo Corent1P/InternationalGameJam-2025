@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 
 [RequireComponent(typeof(AdultManager))]
 public class NetworkAdultController : NetworkPlayerController
@@ -15,11 +16,17 @@ public class NetworkAdultController : NetworkPlayerController
     private InventoryUI inventoryUI;
 
     private AdultManager adultManager;
+    private Animator animator;
+    
+    private NetworkVariable<float> networkAnimSpeed = new NetworkVariable<float>(0f, 
+        NetworkVariableReadPermission.Everyone, 
+        NetworkVariableWritePermission.Owner);
 
     protected override void Awake()
     {
         base.Awake();
         adultManager = GetComponent<AdultManager>();
+        animator = GetComponentInChildren<Animator>();
         shopManager = GetComponent<ShopManager>();
     }
 
@@ -28,6 +35,8 @@ public class NetworkAdultController : NetworkPlayerController
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+
+        networkAnimSpeed.OnValueChanged += OnAnimSpeedChanged;
 
         if (!IsOwner)
         {
@@ -63,7 +72,6 @@ public class NetworkAdultController : NetworkPlayerController
         {
             Debug.LogError("[NetworkAdultController] No Shop UI prefab assigned!");
         }
-
         if (uiPrefabInventory != null)
         {
             uiInventoryInstance = Instantiate(uiPrefabInventory);
@@ -85,6 +93,69 @@ public class NetworkAdultController : NetworkPlayerController
         {
             Debug.LogError("[NetworkAdultController] No Inventory UI prefab assigned!");
         }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+        
+        networkAnimSpeed.OnValueChanged -= OnAnimSpeedChanged;
+    }
+
+    private void OnAnimSpeedChanged(float oldValue, float newValue)
+    {
+        if (animator != null)
+        {
+            animator.SetFloat("Speed", newValue);
+        }
+    }
+
+    // Méthode pour déclencher l'animation de catch/dash
+    public void TriggerCatchAnimation()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger("Catch");
+            Debug.Log($"[NetworkAdultController] Catch trigger activated on animator: {animator.name}");
+            
+            // Vérifier si le trigger existe
+            bool hasCatchTrigger = false;
+            foreach (var param in animator.parameters)
+            {
+                if (param.name == "Catch" && param.type == AnimatorControllerParameterType.Trigger)
+                {
+                    hasCatchTrigger = true;
+                    break;
+                }
+            }
+            
+            if (!hasCatchTrigger)
+            {
+                Debug.LogError($"[NetworkAdultController] Trigger 'Catch' NOT FOUND in Animator parameters!");
+            }
+        }
+        else
+        {
+            Debug.LogError($"[NetworkAdultController] Animator is NULL!");
+        }
+    }
+
+    protected override void HandleMovement()
+    {
+        if (IsOwner)
+        {
+            if (moveInput == Vector2.zero)
+                networkAnimSpeed.Value = 0f;
+            else
+                networkAnimSpeed.Value = 1f;
+        }
+
+        base.HandleMovement();
+    }
+
+    private void HandleBuyRequest(int index)
+    {
+        Debug.Log($"[CLIENT] Player requested to buy item {index}");
     }
 
     public AdultManager GetAdultManager() => adultManager;
