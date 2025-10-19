@@ -333,6 +333,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LayoutGenerator
   roomPrefabs:
+  - {fileID: 4433102013263991010, guid: 4937f78f438014407948f1ec96af5631, type: 3}
   - {fileID: 6934006345371620831, guid: b5075fff7479c3840ba0aa809d373d67, type: 3}
   - {fileID: 5577254305088487662, guid: 08d860d960fcb10449d19dfdb74ca9a7, type: 3}
   - {fileID: 841764262380044153, guid: 36a98d7862c1caf40a0acd39cfdeda20, type: 3}
