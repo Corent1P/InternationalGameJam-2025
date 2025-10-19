@@ -9,6 +9,7 @@ public class LayoutGenerator : MonoBehaviour
 
     [Header("Generation settings")]
     public int maxRooms = 10;
+    public Transform startingPoint;
 
     [Header("Max area for house")]
     public GameObject areaLimiter;
@@ -24,12 +25,14 @@ public class LayoutGenerator : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.G)) {
+        if (Input.GetKeyDown(KeyCode.G))
+        {
             ClearLayout();
             GenerateLayout();
         }
 
-        for (int i = 0; i < vectors.Count; i++) {
+        for (int i = 0; i < vectors.Count; i++)
+        {
             Vector3 cornerA = vectors[i].Item1;
             Vector3 cornerB = vectors[i].Item2;
             Vector3 cornerC = new Vector3(cornerA.x, 0, cornerB.z);
@@ -43,39 +46,44 @@ public class LayoutGenerator : MonoBehaviour
 
     void GenerateLayout()
     {
-        RoomData startRoom = SpawnRoom(roomPrefabs[0], Vector3.zero, roomPrefabs[0].transform.rotation);
+        RoomData startRoom = SpawnRoom(roomPrefabs[0], startingPoint.position, roomPrefabs[0].transform.rotation);
         BoxCollider areaCollider = areaLimiter.GetComponent<BoxCollider>();
         Bounds maxAreaBounds = GetWorldBounds(areaCollider, areaLimiter.transform);
 
         generatedRooms.Add(startRoom);
         openDoors.AddRange(startRoom.Doors);
 
-        for (int i = 1; i < maxRooms; i++) {
+        for (int i = 1; i < maxRooms; i++)
+        {
             if (openDoors.Count == 0) break;
 
             int resetCounter = 0;
-roomReset:
+        roomReset:
             GameObject prefab = roomPrefabs[Random.Range(1, roomPrefabs.Count)];
             RoomData newRoom = SpawnRoom(prefab, Vector3.zero, prefab.transform.rotation);
-            if (newRoom == null || newRoom.RoomName == roomPrefabs[0].GetComponent<RoomData>().RoomName) {
+            if (newRoom == null || newRoom.RoomName == roomPrefabs[0].GetComponent<RoomData>().RoomName)
+            {
                 Destroy(newRoom.gameObject);
                 if (resetCounter++ > 100) break;
                 goto roomReset;
             }
             RoomDoor connectingDoor = newRoom.Doors[Random.Range(0, newRoom.Doors.Count)];
 
-doorReset:
+        doorReset:
             RoomDoor door = openDoors[Random.Range(0, openDoors.Count)];
 
             if (door == null) break;
-            if (door.isConnected) {
+            if (door.isConnected)
+            {
                 openDoors.Remove(door);
                 goto doorReset;
             }
 
-            if (generatedRooms.Count(r => r.RoomName == newRoom.RoomName) >= newRoom.MaxNumberOfAppearances) {
+            if (generatedRooms.Count(r => r.RoomName == newRoom.RoomName) >= newRoom.MaxNumberOfAppearances)
+            {
                 Destroy(newRoom.gameObject);
-                if (resetCounter++ > 100) {
+                if (resetCounter++ > 100)
+                {
                     break;
                 }
                 goto roomReset;
@@ -83,9 +91,11 @@ doorReset:
 
             ConnectDoors(newRoom, door, connectingDoor);
 
-            if (IsRoomClipping(newRoom)) {
+            if (IsRoomClipping(newRoom))
+            {
                 Destroy(newRoom.gameObject);
-                if (resetCounter++ > 100) {
+                if (resetCounter++ > 100)
+                {
                     continue;
                 }
                 goto roomReset;
@@ -96,17 +106,21 @@ doorReset:
             if (!(maxAreaBounds.min.x < newRoomBounds.min.x &&
                   maxAreaBounds.min.z < newRoomBounds.min.z &&
                   maxAreaBounds.max.x > newRoomBounds.max.x &&
-                  maxAreaBounds.max.z > newRoomBounds.max.z)) {
+                  maxAreaBounds.max.z > newRoomBounds.max.z))
+            {
                 Destroy(newRoom.gameObject);
-                if (resetCounter++ > 100) {
+                if (resetCounter++ > 100)
+                {
                     continue;
                 }
                 goto roomReset;
             }
 
-            if (generatedRooms == null) {
+            if (generatedRooms == null)
+            {
                 Destroy(newRoom.gameObject);
-                if (resetCounter++ > 100) {
+                if (resetCounter++ > 100)
+                {
                     break;
                 }
                 goto roomReset;
@@ -115,7 +129,8 @@ doorReset:
             door.isConnected = true;
             connectingDoor.isConnected = true;
 
-            if (newRoom != null) {
+            if (newRoom != null)
+            {
                 generatedRooms.Add(newRoom);
                 openDoors.AddRange(newRoom.Doors);
 
@@ -127,7 +142,8 @@ doorReset:
             }
         }
         generatedRooms.RemoveAll(r => r == null);
-        if (generatedRooms.Count < 4) {
+        if (generatedRooms.Count < 4)
+        {
             ClearLayout();
             GenerateLayout();
         }
@@ -152,7 +168,8 @@ doorReset:
 
     void ClearLayout()
     {
-        foreach (RoomData room in generatedRooms) {
+        foreach (RoomData room in generatedRooms)
+        {
             if (room != null)
                 Destroy(room.gameObject);
         }
@@ -164,21 +181,58 @@ doorReset:
 
     void ConnectDoors(RoomData newRoom, RoomDoor oldDoor, RoomDoor newDoor)
     {
-        newRoom.transform.position +=
-            oldDoor.transform.position - newDoor.transform.position;
-        newRoom.transform.position = new Vector3(newRoom.transform.position.x, 0f, newRoom.transform.position.z);
+        // Aligner la nouvelle porte exactement sur l'ancienne porte (position complète incluant Y)
+        Vector3 offset = oldDoor.transform.position - newDoor.transform.position;
+        newRoom.transform.position += offset;
+
+        // Aligner les rotations pour que les portes soient face à face
+        Vector3 oldDoorForward = oldDoor.transform.forward;
+        Vector3 newDoorForward = newDoor.transform.forward;
+
+        // Calculer l'angle de rotation nécessaire pour que les portes soient opposées
+        float angleY = Vector3.SignedAngle(newDoorForward, -oldDoorForward, Vector3.up);
+
+        // Appliquer la rotation autour de la position de la nouvelle porte
+        newRoom.transform.RotateAround(newDoor.transform.position, Vector3.up, angleY);
+
+        // Recalculer l'offset après rotation pour s'assurer que les portes sont parfaitement alignées
+        offset = oldDoor.transform.position - newDoor.transform.position;
+        newRoom.transform.position += offset;
 
         RoomData oldRoom = oldDoor.GetComponentInParent<RoomData>();
-        float minIntersection = float.MaxValue;
 
-        for (int i = 0; i < 8; i++) {
+        // Essayer différentes rotations (90°, 180°, 270°) pour minimiser le chevauchement
+        float minIntersection = GetColliderIntersectionArea(oldRoom, newRoom);
+        Vector3 bestPosition = newRoom.transform.position;
+        Quaternion bestRotation = newRoom.transform.rotation;
+
+        for (int i = 1; i < 4; i++)
+        {
+            // Rotation de 90° autour de la porte
+            newRoom.transform.RotateAround(newDoor.transform.position, Vector3.up, 90f);
+
+            // Réaligner après rotation
+            offset = oldDoor.transform.position - newDoor.transform.position;
+            newRoom.transform.position += offset;
+
             float intersection = GetColliderIntersectionArea(oldRoom, newRoom);
 
-            if (intersection <= 5f) {
+            if (intersection < minIntersection)
+            {
+                minIntersection = intersection;
+                bestPosition = newRoom.transform.position;
+                bestRotation = newRoom.transform.rotation;
+            }
+
+            if (intersection <= 5f)
+            {
                 return;
             }
-            newRoom.transform.RotateAround(newDoor.transform.position, Vector3.up, 90f);
         }
+
+        // Appliquer la meilleure configuration trouvée
+        newRoom.transform.position = bestPosition;
+        newRoom.transform.rotation = bestRotation;
     }
 
     float GetColliderIntersectionArea(RoomData roomA, RoomData roomB)
@@ -197,9 +251,9 @@ doorReset:
             return 0f;
         }
 
-        float overlapX = Mathf.Min(boundsA.max.x, boundsB.max.x) - 
+        float overlapX = Mathf.Min(boundsA.max.x, boundsB.max.x) -
                          Mathf.Max(boundsA.min.x, boundsB.min.x);
-        float overlapZ = Mathf.Min(boundsA.max.z, boundsB.max.z) - 
+        float overlapZ = Mathf.Min(boundsA.max.z, boundsB.max.z) -
                          Mathf.Max(boundsA.min.z, boundsB.min.z);
 
         if (overlapX <= 0 || overlapZ <= 0)
@@ -219,21 +273,21 @@ doorReset:
         Vector3 center = transform.TransformPoint(collider.center);
         Vector3 size = collider.size;
         Vector3[] corners = new Vector3[8];
-        corners[0] = transform.TransformPoint(collider.center + 
+        corners[0] = transform.TransformPoint(collider.center +
             new Vector3(-size.x, -size.y, -size.z) * 0.5f);
-        corners[1] = transform.TransformPoint(collider.center + 
+        corners[1] = transform.TransformPoint(collider.center +
             new Vector3(size.x, -size.y, -size.z) * 0.5f);
-        corners[2] = transform.TransformPoint(collider.center + 
+        corners[2] = transform.TransformPoint(collider.center +
             new Vector3(-size.x, size.y, -size.z) * 0.5f);
-        corners[3] = transform.TransformPoint(collider.center + 
+        corners[3] = transform.TransformPoint(collider.center +
             new Vector3(size.x, size.y, -size.z) * 0.5f);
-        corners[4] = transform.TransformPoint(collider.center + 
+        corners[4] = transform.TransformPoint(collider.center +
             new Vector3(-size.x, -size.y, size.z) * 0.5f);
-        corners[5] = transform.TransformPoint(collider.center + 
+        corners[5] = transform.TransformPoint(collider.center +
             new Vector3(size.x, -size.y, size.z) * 0.5f);
-        corners[6] = transform.TransformPoint(collider.center + 
+        corners[6] = transform.TransformPoint(collider.center +
             new Vector3(-size.x, size.y, size.z) * 0.5f);
-        corners[7] = transform.TransformPoint(collider.center + 
+        corners[7] = transform.TransformPoint(collider.center +
             new Vector3(size.x, size.y, size.z) * 0.5f);
 
         // Create axis-aligned bounding box from corners
@@ -248,12 +302,12 @@ doorReset:
 
     bool IsRoomClipping(RoomData newRoom)
     {
-        foreach (RoomData generatedRoom in generatedRooms) {
-            if (generatedRoom == null) continue;
-            if (GetColliderIntersectionArea(generatedRoom, newRoom) > 10f) {
-                return true;
-            }
-        }
+        // foreach (RoomData generatedRoom in generatedRooms) {
+        //     if (generatedRoom == null) continue;
+        //     if (GetColliderIntersectionArea(generatedRoom, newRoom) > 10f) {
+        //         return true;
+        //     }
+        // }
         return false;
     }
 }
