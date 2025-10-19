@@ -460,9 +460,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.21407077
-  m_Height: 2
+  m_Height: 1.80087
   m_Direction: 1
-  m_Center: {x: 0.0007840395, y: 0, z: -0.03200096}
+  m_Center: {x: 0.0007840395, y: -0.09956503, z: -0.03200096}
 --- !u!114 &5454596173392547724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -512,7 +512,7 @@ Transform:
   m_GameObject: {fileID: 5286102647677527768}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.002, y: 0.42, z: -0.056}
+  m_LocalPosition: {x: 0.002, y: 0.6873, z: -0.056}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -686,7 +686,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '[Left click] Open doors'
+  m_text: '[Left click] Open doors
+
+    [E] Stole the candy'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
