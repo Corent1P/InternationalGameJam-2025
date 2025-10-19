@@ -242,6 +242,9 @@ public class AdultCatchSystem : NetworkBehaviour
         // Récompenser l'adulte
         adultManager.AddCoins(coinsReward);
 
+        // Déclencher l'animation de catch sur tous les clients
+        TriggerCatchAnimationClientRpc();
+
         // Effet visuel de catch sur tous les clients
         PlayCatchEffectClientRpc(child.NetworkObjectId);
 
