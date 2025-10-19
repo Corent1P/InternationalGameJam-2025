@@ -110,15 +110,26 @@ doorReset:
         return go.GetComponent<RoomData>();
     }
 
+    // Vector3 GetRoomWorldSize(RoomData room)
+    // {
+    //     Collider[] colliders = room.GetComponentsInChildren<Collider>();
+    //     if (colliders.Length == 0)
+    //         return Vector3.zero;
+
+    //     Bounds bounds = new Bounds(colliders[0].bounds.center, Vector3.zero);
+    //     foreach (Collider col in colliders)
+    //         bounds.Encapsulate(col.bounds);
+
+    //     return bounds.size;
+    // }
+
     Vector3 GetRoomWorldSize(RoomData room)
     {
-        Collider[] colliders = room.GetComponentsInChildren<Collider>();
-        if (colliders.Length == 0)
+        Collider collider = room.GetComponent<Collider>();
+        if (collider == null)
             return Vector3.zero;
 
-        Bounds bounds = new Bounds(colliders[0].bounds.center, Vector3.zero);
-        foreach (Collider col in colliders)
-            bounds.Encapsulate(col.bounds);
+        Bounds bounds = new Bounds(collider.bounds.center, Vector3.zero);
 
         return bounds.size;
     }
@@ -137,39 +148,66 @@ doorReset:
 
     void ConnectDoors(RoomData newRoom, RoomDoor oldDoor, RoomDoor newDoor)
     {
-        newRoom.transform.position += 
+        newRoom.transform.position +=
             oldDoor.transform.position - newDoor.transform.position;
 
-        RoomData oldRoom = oldDoor.GetComponentInParent<RoomData>();
+        //! A décommenter
+        // RoomData oldRoom = oldDoor.GetComponentInParent<RoomData>();
 
-        for (int i = 0; i < 4; i++) {
-            float intersection = GetColliderIntersectionArea(oldRoom, newRoom);
+        for (int i = 0; i < 4; i++)
+        {
+            // float intersection = GetColliderIntersectionArea(oldRoom, newRoom);
 
-            if (intersection < 0.01f) {
-                return;
-            }
+            // Debug.Log("Intersection between " + newRoom.RoomName + " and " + oldRoom.RoomName + ": " + intersection);
+            // if (intersection < 0.01f)
+            // {
+            //     Debug.Log("Connected " + newRoom.RoomName + " to " + oldRoom.RoomName);
+            //     return;
+            // }
             newRoom.transform.RotateAround(newDoor.transform.position, Vector3.up, 90f);
         }
     }
 
-    float GetColliderIntersectionArea(RoomData roomA, RoomData roomB)
-    {
-        Collider[] collidersA = roomA.GetComponentsInChildren<Collider>();
-        Collider[] collidersB = roomB.GetComponentsInChildren<Collider>();
+    // float GetColliderIntersectionArea(RoomData roomA, RoomData roomB)
+    // {
+    //     Collider[] collidersA = roomA.GetComponentsInChildren<Collider>();
+    //     Collider[] collidersB = roomB.GetComponentsInChildren<Collider>();
 
-        Bounds boundsA = collidersA[0].bounds;
-        Bounds boundsB = collidersB[0].bounds;
+    //     Bounds boundsA = collidersA[0].bounds;
+    //     Bounds boundsB = collidersB[0].bounds;
+
+    //     Vector3 boundsAMin = boundsA.min + roomA.transform.position;
+    //     Vector3 boundsAMax = boundsA.max + roomA.transform.position;
+    //     Vector3 boundsBMin = boundsB.min + roomB.transform.position;
+    //     Vector3 boundsBMax = boundsB.max + roomB.transform.position;
+
+    //     float overlapX = Mathf.Max(boundsAMin.x, boundsBMin.x) - Mathf.Min(boundsAMax.x, boundsBMax.x);
+    //     float overlapY = Mathf.Max(boundsAMin.z, boundsBMin.z) - Mathf.Min(boundsAMax.z, boundsBMax.z);
+
+    //     float overlapArea = overlapX * overlapY;
+    //     float areaA = boundsA.size.x * boundsA.size.z;
+
+    //     if (areaA < 0.01f)
+    //         return 0f;
+
+    //     return overlapArea / areaA * 100f;
+    // }
+    
+        float GetColliderIntersectionArea(RoomData roomA, RoomData roomB)
+    {
+        Collider collidersA = roomA.GetComponent<Collider>();
+        Collider collidersB = roomB.GetComponent<Collider>();
+
+        Bounds boundsA = collidersA.bounds;
+        Bounds boundsB = collidersB.bounds;
 
         Vector3 boundsAMin = boundsA.min + roomA.transform.position;
         Vector3 boundsAMax = boundsA.max + roomA.transform.position;
         Vector3 boundsBMin = boundsB.min + roomB.transform.position;
         Vector3 boundsBMax = boundsB.max + roomB.transform.position;
 
-        float overlapX = 0f;
-        float overlapY = 0f;
-
-        overlapX = Mathf.Max(boundsAMin.x, boundsBMin.x) - Mathf.Min(boundsAMax.x, boundsBMax.x);
-        overlapY = Mathf.Max(boundsAMin.z, boundsBMin.z) - Mathf.Min(boundsAMax.z, boundsBMax.z);
+        float overlapX = Mathf.Max(boundsAMin.x, boundsBMin.x) - Mathf.Min(boundsAMax.x, boundsBMax.x);
+        float overlapY = Mathf.Max(boundsAMin.z, boundsBMin.z) - Mathf.Min(boundsAMax.z, boundsBMax.z);
 
         float overlapArea = overlapX * overlapY;
         float areaA = boundsA.size.x * boundsA.size.z;
@@ -177,18 +215,19 @@ doorReset:
         if (areaA < 0.01f)
             return 0f;
 
-        return (overlapArea / areaA) * 100f;
+        return overlapArea / areaA * 100f;
     }
 
     bool IsRoomClipping(RoomData newRoom)
     {
-        foreach (RoomData generatedRoom in generatedRooms) {
-            if (generatedRoom == null) continue;
-            float temp = GetColliderIntersectionArea(generatedRoom, newRoom);
-            if (GetColliderIntersectionArea(generatedRoom, newRoom) > 1f) {
-                return true;
-            }
-        }
+        //! A décommenter
+        // foreach (RoomData generatedRoom in generatedRooms) {
+        //     if (generatedRoom == null) continue;
+        //     // float temp = GetColliderIntersectionArea(generatedRoom, newRoom);
+        //     if (GetColliderIntersectionArea(generatedRoom, newRoom) > 1f) {
+        //         return true;
+        //     }
+        // }
         return false;
     }
 }
