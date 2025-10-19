@@ -206,6 +206,7 @@ public class InventoryUI : MonoBehaviour
 
         // Créer l'objet fantôme
         previewInstance = Instantiate(prefab);
+        previewInstance.transform.position = new Vector3(previewInstance.transform.position.x, previewInstance.transform.position.y - 0.9f, previewInstance.transform.position.z);
         previewSlot = slot;
 
         // Désactiver les collisions et la logique réseau
@@ -228,6 +229,8 @@ public class InventoryUI : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, 100f, groundLayer))
             targetPosition = hit.point;
+
+        targetPosition.y -= 0.9f;
 
         previewInstance.transform.position = targetPosition;
         previewInstance.transform.rotation = Quaternion.identity;
