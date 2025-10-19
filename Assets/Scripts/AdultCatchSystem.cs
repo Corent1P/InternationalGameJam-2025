@@ -20,6 +20,7 @@ public class AdultCatchSystem : NetworkBehaviour
     [Header("Visual Feedback")]
     [SerializeField] private ParticleSystem dashEffect;
     [SerializeField] private ParticleSystem catchEffect;
+    [SerializeField] private NetworkSoundManager networkSoundManager;
 
     private AdultManager adultManager;
     private Rigidbody rb;
@@ -33,6 +34,7 @@ public class AdultCatchSystem : NetworkBehaviour
     {
         adultManager = GetComponent<AdultManager>();
         rb = GetComponent<Rigidbody>();
+        networkSoundManager = FindAnyObjectByType<NetworkSoundManager>();
         
         // Initialiser les inputs
         playerInputs = new PlayerInputs();
@@ -120,6 +122,12 @@ public class AdultCatchSystem : NetworkBehaviour
         if (dashEffect != null && IsOwner)
         {
             dashEffect.Play();
+        }
+
+        // Son du dash
+        if (networkSoundManager != null)
+        {
+            networkSoundManager.PlayDashSound(transform.position);
         }
 
         Vector3 direction = dashDirection.normalized;

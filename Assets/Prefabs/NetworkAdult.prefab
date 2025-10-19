@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 549769019115032857}
   - component: {fileID: 1139229214328420331}
   - component: {fileID: 508841522827383123}
+  - component: {fileID: 7200142726733309362}
   m_Layer: 0
   m_Name: NetworkAdult
   m_TagString: Adult
@@ -251,6 +252,26 @@ MonoBehaviour:
   coinsReward: 10
   dashEffect: {fileID: 0}
   catchEffect: {fileID: 0}
+--- !u!114 &7200142726733309362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5012626422881075760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 644c163e3a3504d408bd2c2753f635f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerFootsteps
+  ShowTopMostFoldoutHeaderGroup: 1
+  stepInterval: 0.5
+  minSpeedForFootsteps: 0.1
+  playOnlyWhenGrounded: 1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  groundCheckDistance: 0.3
 --- !u!1 &5286102647677527768
 GameObject:
   m_ObjectHideFlags: 0
