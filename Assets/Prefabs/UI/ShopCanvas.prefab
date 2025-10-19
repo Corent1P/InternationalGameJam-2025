@@ -124,19 +124,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c0d0664058794ab4b1e813a69486f5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShopRadialMenu
-  ShowTopMostFoldoutHeaderGroup: 1
   radialMenuPanel: {fileID: 2307886525225880451}
   itemsContainer: {fileID: 1599378454899191557}
   itemButtonPrefab: {fileID: 2297171592639472429}
   shopKey: 98
   selectionRadius: 150
   shopItems:
-  - itemName: Paralisys
+  - itemName: Paralysis
     price: 0
-    itemPrefab: {fileID: 3310954310743593055, guid: 260654610409d4e8fbf7dbd15688b26e, type: 3}
-  - itemName: Gulag
-    price: 1
-    itemPrefab: {fileID: 3468597561850981788, guid: 4cb9bdac258194c2cac1c151c73367a7, type: 3}
+    itemPrefab: {fileID: 625909356469512359, guid: 5b31ad81d2f4f4cc4afa25b6ab7f50ef, type: 3}
+  - itemName: Slow Trap
+    price: 0
+    itemPrefab: {fileID: 6532853265911629326, guid: 9dd6d9bb83e2c443d961c4c7ade9673e, type: 3}
+  - itemName: Sound Detector Trap
+    price: 0
+    itemPrefab: {fileID: 5495674486607559409, guid: 84559adf26a054cddb18629ab704779a, type: 3}
 --- !u!1 &5115277345681318212
 GameObject:
   m_ObjectHideFlags: 0
