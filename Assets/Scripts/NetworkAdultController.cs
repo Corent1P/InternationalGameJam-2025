@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 
 [RequireComponent(typeof(AdultManager))]
 public class NetworkAdultController : NetworkPlayerController
@@ -15,12 +16,18 @@ public class NetworkAdultController : NetworkPlayerController
     private InventoryUI inventoryUI;
 
     private AdultManager adultManager;
+    private Animator animator;
+    
+    private NetworkVariable<float> networkAnimSpeed = new NetworkVariable<float>(0f, 
+        NetworkVariableReadPermission.Everyone, 
+        NetworkVariableWritePermission.Owner);
 
     protected override void Awake()
     {
         base.Awake();
         adultManager = GetComponent<AdultManager>();
         shopManager = GetComponent<ShopManager>();
+        animator = GetComponentInChildren<Animator>();
     }
 
     public ShopRadialMenu GetShopMenu() => shopMenu;
@@ -29,9 +36,11 @@ public class NetworkAdultController : NetworkPlayerController
     {
         base.OnNetworkSpawn();
 
+        networkAnimSpeed.OnValueChanged += OnAnimSpeedChanged;
+
         if (!IsOwner)
         {
-            Debug.Log($"[NetworkAdultController] Not owner, skipping UI initialization for {gameObject.name}.");
+            Debug.LogWarning("[NetworkAdultController] This controller is not the owner, skipping shop init.");
             return;
         }
 
@@ -85,6 +94,39 @@ public class NetworkAdultController : NetworkPlayerController
         {
             Debug.LogError("[NetworkAdultController] No Inventory UI prefab assigned!");
         }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+        
+        networkAnimSpeed.OnValueChanged -= OnAnimSpeedChanged;
+    }
+
+    private void OnAnimSpeedChanged(float oldValue, float newValue)
+    {
+        if (animator != null)
+        {
+            animator.SetFloat("Speed", newValue);
+        }
+    }
+
+    protected override void HandleMovement()
+    {
+        if (IsOwner)
+        {
+            if (moveInput == Vector2.zero)
+                networkAnimSpeed.Value = 0f;
+            else
+                networkAnimSpeed.Value = 1f;
+        }
+
+        base.HandleMovement();
+    }
+
+    private void HandleBuyRequest(int index)
+    {
+        Debug.Log($"[CLIENT] Player requested to buy item {index}");
     }
 
     public AdultManager GetAdultManager() => adultManager;
