@@ -47,7 +47,7 @@ public class AdultCatchSystem : NetworkBehaviour
         if (IsOwner)
         {
             playerInputs.PlayerControls.Enable();
-            playerInputs.PlayerControls.Interact.performed += ctx => TryDashCatch();
+            playerInputs.PlayerControls.Dash.performed += ctx => TryDashCatch();
         }
     }
 
@@ -57,7 +57,7 @@ public class AdultCatchSystem : NetworkBehaviour
         
         if (IsOwner)
         {
-            playerInputs.PlayerControls.Interact.performed -= ctx => TryDashCatch();
+            playerInputs.PlayerControls.Dash.performed -= ctx => TryDashCatch();
             playerInputs.PlayerControls.Disable();
         }
     }
@@ -68,7 +68,7 @@ public class AdultCatchSystem : NetworkBehaviour
     }
 
     /// <summary>
-    /// Appelé quand le joueur appuie sur Interact
+    /// Appelé quand le joueur appuie sur Dash
     /// </summary>
     private void TryDashCatch()
     {
