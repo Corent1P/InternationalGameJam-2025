@@ -120,7 +120,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Dash"",
+                    ""name"": ""Interact"",
                     ""type"": ""Button"",
                     ""id"": ""153e4273-ca9e-4b72-8149-8a56755295dd"",
                     ""expectedControlType"": """",
@@ -129,7 +129,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Interact"",
+                    ""name"": ""Dash"",
                     ""type"": ""Button"",
                     ""id"": ""8d9a77a7-d110-4d4a-a233-c063a362a06d"",
                     ""expectedControlType"": """",
@@ -278,7 +278,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Dash"",
+                    ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -289,7 +289,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Dash"",
+                    ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -300,7 +300,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Interact"",
+                    ""action"": ""Dash"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -314,8 +314,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         m_PlayerControls_Move = m_PlayerControls.FindAction("Move", throwIfNotFound: true);
         m_PlayerControls_Look = m_PlayerControls.FindAction("Look", throwIfNotFound: true);
         m_PlayerControls_Jump = m_PlayerControls.FindAction("Jump", throwIfNotFound: true);
-        m_PlayerControls_Dash = m_PlayerControls.FindAction("Dash", throwIfNotFound: true);
         m_PlayerControls_Interact = m_PlayerControls.FindAction("Interact", throwIfNotFound: true);
+        m_PlayerControls_Dash = m_PlayerControls.FindAction("Dash", throwIfNotFound: true);
     }
 
     ~@PlayerInputs()
@@ -399,8 +399,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerControls_Move;
     private readonly InputAction m_PlayerControls_Look;
     private readonly InputAction m_PlayerControls_Jump;
-    private readonly InputAction m_PlayerControls_Dash;
     private readonly InputAction m_PlayerControls_Interact;
+    private readonly InputAction m_PlayerControls_Dash;
     /// <summary>
     /// Provides access to input actions defined in input action map "PlayerControls".
     /// </summary>
@@ -425,13 +425,13 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Jump => m_Wrapper.m_PlayerControls_Jump;
         /// <summary>
-        /// Provides access to the underlying input action "PlayerControls/Dash".
-        /// </summary>
-        public InputAction @Dash => m_Wrapper.m_PlayerControls_Dash;
-        /// <summary>
         /// Provides access to the underlying input action "PlayerControls/Interact".
         /// </summary>
         public InputAction @Interact => m_Wrapper.m_PlayerControls_Interact;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerControls/Dash".
+        /// </summary>
+        public InputAction @Dash => m_Wrapper.m_PlayerControls_Dash;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -467,12 +467,12 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
-            @Dash.started += instance.OnDash;
-            @Dash.performed += instance.OnDash;
-            @Dash.canceled += instance.OnDash;
             @Interact.started += instance.OnInteract;
             @Interact.performed += instance.OnInteract;
             @Interact.canceled += instance.OnInteract;
+            @Dash.started += instance.OnDash;
+            @Dash.performed += instance.OnDash;
+            @Dash.canceled += instance.OnDash;
         }
 
         /// <summary>
@@ -493,12 +493,12 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
-            @Dash.started -= instance.OnDash;
-            @Dash.performed -= instance.OnDash;
-            @Dash.canceled -= instance.OnDash;
             @Interact.started -= instance.OnInteract;
             @Interact.performed -= instance.OnInteract;
             @Interact.canceled -= instance.OnInteract;
+            @Dash.started -= instance.OnDash;
+            @Dash.performed -= instance.OnDash;
+            @Dash.canceled -= instance.OnDash;
         }
 
         /// <summary>
@@ -561,18 +561,18 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnJump(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Dash" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnDash(InputAction.CallbackContext context);
-        /// <summary>
         /// Method invoked when associated input action "Interact" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnInteract(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Dash" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDash(InputAction.CallbackContext context);
     }
 }

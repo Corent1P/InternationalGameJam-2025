@@ -11,8 +11,6 @@ public class NetworkDoor : NetworkBehaviour
 
     [Header("Interaction Settings")]
     [SerializeField] private float interactionDistance = 2f;
-    [SerializeField] private KeyCode interactKey = KeyCode.E;
-    [SerializeField] private string interactButtonName = "Interact"; // Nom dans Input System
 
     [Header("Audio (Optional)")]
     [SerializeField] private AudioClip openSound;
@@ -188,7 +186,9 @@ public class NetworkDoor : NetworkBehaviour
     /// </summary>
     private void ToggleDoor()
     {
+        Debug.Log("ToggleDoor called");
         if (playerInRange == null) return;
+        Debug.Log("Player is in range");
         if (isAnimating) return;
 
         // Demander au serveur de changer l'état
@@ -268,7 +268,7 @@ public class NetworkDoor : NetworkBehaviour
             var promptText = interactPrompt.GetComponentInChildren<TMPro.TextMeshProUGUI>();
             if (promptText != null)
             {
-                promptText.text = isOpen.Value ? $"Press {interactKey} to Close" : $"Press {interactKey} to Open";
+                promptText.text = isOpen.Value ? $"Press Left Click to Close" : $"Press Left Click to Open";
             }
         }
     }
