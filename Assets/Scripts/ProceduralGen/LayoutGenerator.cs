@@ -10,6 +10,9 @@ public class LayoutGenerator : MonoBehaviour
     [Header("Generation settings")]
     public int maxRooms = 10;
 
+    [Header("Max area for house")]
+    public GameObject areaLimiter;
+
     private List<RoomData> generatedRooms = new List<RoomData>();
     private List<RoomDoor> openDoors = new List<RoomDoor>();
     private List<(Vector3, Vector3)> vectors = new List<(Vector3, Vector3)>();
@@ -25,14 +28,27 @@ public class LayoutGenerator : MonoBehaviour
             ClearLayout();
             GenerateLayout();
         }
+
+        for (int i = 0; i < vectors.Count; i++) {
+            Vector3 cornerA = vectors[i].Item1;
+            Vector3 cornerB = vectors[i].Item2;
+            Vector3 cornerC = new Vector3(cornerA.x, 0, cornerB.z);
+            Vector3 cornerD = new Vector3(cornerB.x, 0, cornerA.z);
+            // Debug.DrawLine(cornerA, cornerC, Color.red, 1000, true);
+            // Debug.DrawLine(cornerC, cornerB, Color.red, 1000, true);
+            // Debug.DrawLine(cornerB, cornerD, Color.red, 1000, true);
+            // Debug.DrawLine(cornerD, cornerA, Color.red, 1000, true);
+        }
     }
 
     void GenerateLayout()
     {
-        RoomData StartRoom = SpawnRoom(roomPrefabs[0], Vector3.zero, roomPrefabs[0].transform.rotation);
+        RoomData startRoom = SpawnRoom(roomPrefabs[0], Vector3.zero, roomPrefabs[0].transform.rotation);
+        BoxCollider areaCollider = areaLimiter.GetComponent<BoxCollider>();
+        Bounds maxAreaBounds = GetWorldBounds(areaCollider, areaLimiter.transform);
 
-        generatedRooms.Add(StartRoom);
-        openDoors.AddRange(StartRoom.Doors);
+        generatedRooms.Add(startRoom);
+        openDoors.AddRange(startRoom.Doors);
 
         for (int i = 1; i < maxRooms; i++) {
             if (openDoors.Count == 0) break;
@@ -43,7 +59,6 @@ roomReset:
             RoomData newRoom = SpawnRoom(prefab, Vector3.zero, prefab.transform.rotation);
             if (newRoom == null || newRoom.RoomName == roomPrefabs[0].GetComponent<RoomData>().RoomName) {
                 Destroy(newRoom.gameObject);
-                // Debug.Log("Destroyed room due to null or same as start room.");
                 if (resetCounter++ > 100) break;
                 goto roomReset;
             }
@@ -61,7 +76,6 @@ doorReset:
             if (generatedRooms.Count(r => r.RoomName == newRoom.RoomName) >= newRoom.MaxNumberOfAppearances) {
                 Destroy(newRoom.gameObject);
                 if (resetCounter++ > 100) {
-                    Debug.Log("Max reset attempts reached. Stopping generation. 1");
                     break;
                 }
                 goto roomReset;
@@ -72,7 +86,19 @@ doorReset:
             if (IsRoomClipping(newRoom)) {
                 Destroy(newRoom.gameObject);
                 if (resetCounter++ > 100) {
-                    Debug.Log("Max reset attempts reached. Stopping generation. 2");
+                    continue;
+                }
+                goto roomReset;
+            }
+
+            BoxCollider newRoomCollider = newRoom.GetComponent<BoxCollider>();
+            Bounds newRoomBounds = GetWorldBounds(newRoomCollider, newRoom.transform);
+            if (!(maxAreaBounds.min.x < newRoomBounds.min.x &&
+                  maxAreaBounds.min.z < newRoomBounds.min.z &&
+                  maxAreaBounds.max.x > newRoomBounds.max.x &&
+                  maxAreaBounds.max.z > newRoomBounds.max.z)) {
+                Destroy(newRoom.gameObject);
+                if (resetCounter++ > 100) {
                     continue;
                 }
                 goto roomReset;
@@ -81,7 +107,6 @@ doorReset:
             if (generatedRooms == null) {
                 Destroy(newRoom.gameObject);
                 if (resetCounter++ > 100) {
-                    Debug.Log("Max reset attempts reached. Stopping generation. 3");
                     break;
                 }
                 goto roomReset;
@@ -90,15 +115,19 @@ doorReset:
             door.isConnected = true;
             connectingDoor.isConnected = true;
 
-            generatedRooms.Add(newRoom);
-            Debug.Log("Room added: " + newRoom.RoomName);
-            openDoors.AddRange(newRoom.Doors);
+            if (newRoom != null) {
+                generatedRooms.Add(newRoom);
+                openDoors.AddRange(newRoom.Doors);
 
-            openDoors.Remove(door);
-            openDoors.Remove(connectingDoor);
+                vectors.Add((new Vector3(newRoomBounds.min.x, 0, newRoomBounds.min.z),
+                             new Vector3(newRoomBounds.max.x, 0, newRoomBounds.max.z)));
+
+                openDoors.Remove(door);
+                openDoors.Remove(connectingDoor);
+            }
         }
         generatedRooms.RemoveAll(r => r == null);
-        if (generatedRooms.Count < 10) {
+        if (generatedRooms.Count < 4) {
             ClearLayout();
             GenerateLayout();
         }
@@ -109,19 +138,6 @@ doorReset:
         GameObject go = Instantiate(prefab, pos, rot);
         return go.GetComponent<RoomData>();
     }
-
-    // Vector3 GetRoomWorldSize(RoomData room)
-    // {
-    //     Collider[] colliders = room.GetComponentsInChildren<Collider>();
-    //     if (colliders.Length == 0)
-    //         return Vector3.zero;
-
-    //     Bounds bounds = new Bounds(colliders[0].bounds.center, Vector3.zero);
-    //     foreach (Collider col in colliders)
-    //         bounds.Encapsulate(col.bounds);
-
-    //     return bounds.size;
-    // }
 
     Vector3 GetRoomWorldSize(RoomData room)
     {
@@ -150,66 +166,46 @@ doorReset:
     {
         newRoom.transform.position +=
             oldDoor.transform.position - newDoor.transform.position;
+        newRoom.transform.position = new Vector3(newRoom.transform.position.x, 0f, newRoom.transform.position.z);
 
-        //! A décommenter
-        // RoomData oldRoom = oldDoor.GetComponentInParent<RoomData>();
+        RoomData oldRoom = oldDoor.GetComponentInParent<RoomData>();
+        float minIntersection = float.MaxValue;
 
-        for (int i = 0; i < 4; i++)
-        {
-            // float intersection = GetColliderIntersectionArea(oldRoom, newRoom);
+        for (int i = 0; i < 8; i++) {
+            float intersection = GetColliderIntersectionArea(oldRoom, newRoom);
 
-            // Debug.Log("Intersection between " + newRoom.RoomName + " and " + oldRoom.RoomName + ": " + intersection);
-            // if (intersection < 0.01f)
-            // {
-            //     Debug.Log("Connected " + newRoom.RoomName + " to " + oldRoom.RoomName);
-            //     return;
-            // }
+            if (intersection <= 5f) {
+                return;
+            }
             newRoom.transform.RotateAround(newDoor.transform.position, Vector3.up, 90f);
         }
     }
 
-    // float GetColliderIntersectionArea(RoomData roomA, RoomData roomB)
-    // {
-    //     Collider[] collidersA = roomA.GetComponentsInChildren<Collider>();
-    //     Collider[] collidersB = roomB.GetComponentsInChildren<Collider>();
-
-    //     Bounds boundsA = collidersA[0].bounds;
-    //     Bounds boundsB = collidersB[0].bounds;
-
-    //     Vector3 boundsAMin = boundsA.min + roomA.transform.position;
-    //     Vector3 boundsAMax = boundsA.max + roomA.transform.position;
-    //     Vector3 boundsBMin = boundsB.min + roomB.transform.position;
-    //     Vector3 boundsBMax = boundsB.max + roomB.transform.position;
-
-    //     float overlapX = Mathf.Max(boundsAMin.x, boundsBMin.x) - Mathf.Min(boundsAMax.x, boundsBMax.x);
-    //     float overlapY = Mathf.Max(boundsAMin.z, boundsBMin.z) - Mathf.Min(boundsAMax.z, boundsBMax.z);
-
-    //     float overlapArea = overlapX * overlapY;
-    //     float areaA = boundsA.size.x * boundsA.size.z;
-
-    //     if (areaA < 0.01f)
-    //         return 0f;
-
-    //     return overlapArea / areaA * 100f;
-    // }
-    
-        float GetColliderIntersectionArea(RoomData roomA, RoomData roomB)
+    float GetColliderIntersectionArea(RoomData roomA, RoomData roomB)
     {
-        Collider collidersA = roomA.GetComponent<Collider>();
-        Collider collidersB = roomB.GetComponent<Collider>();
+        BoxCollider boxA = roomA.GetComponent<BoxCollider>();
+        BoxCollider boxB = roomB.GetComponent<BoxCollider>();
 
-        Bounds boundsA = collidersA.bounds;
-        Bounds boundsB = collidersB.bounds;
+        if (boxA == null || boxB == null)
+            return 0f;
 
-        Vector3 boundsAMin = boundsA.min + roomA.transform.position;
-        Vector3 boundsAMax = boundsA.max + roomA.transform.position;
-        Vector3 boundsBMin = boundsB.min + roomB.transform.position;
-        Vector3 boundsBMax = boundsB.max + roomB.transform.position;
+        Bounds boundsA = GetWorldBounds(boxA, roomA.transform);
+        Bounds boundsB = GetWorldBounds(boxB, roomB.transform);
 
-        float overlapX = Mathf.Max(boundsAMin.x, boundsBMin.x) - Mathf.Min(boundsAMax.x, boundsBMax.x);
-        float overlapY = Mathf.Max(boundsAMin.z, boundsBMin.z) - Mathf.Min(boundsAMax.z, boundsBMax.z);
+        if (!boundsA.Intersects(boundsB))
+        {
+            return 0f;
+        }
 
-        float overlapArea = overlapX * overlapY;
+        float overlapX = Mathf.Min(boundsA.max.x, boundsB.max.x) - 
+                         Mathf.Max(boundsA.min.x, boundsB.min.x);
+        float overlapZ = Mathf.Min(boundsA.max.z, boundsB.max.z) - 
+                         Mathf.Max(boundsA.min.z, boundsB.min.z);
+
+        if (overlapX <= 0 || overlapZ <= 0)
+            return 0f;
+
+        float overlapArea = overlapX * overlapZ;
         float areaA = boundsA.size.x * boundsA.size.z;
 
         if (areaA < 0.01f)
@@ -218,16 +214,46 @@ doorReset:
         return overlapArea / areaA * 100f;
     }
 
+    Bounds GetWorldBounds(BoxCollider collider, Transform transform)
+    {
+        Vector3 center = transform.TransformPoint(collider.center);
+        Vector3 size = collider.size;
+        Vector3[] corners = new Vector3[8];
+        corners[0] = transform.TransformPoint(collider.center + 
+            new Vector3(-size.x, -size.y, -size.z) * 0.5f);
+        corners[1] = transform.TransformPoint(collider.center + 
+            new Vector3(size.x, -size.y, -size.z) * 0.5f);
+        corners[2] = transform.TransformPoint(collider.center + 
+            new Vector3(-size.x, size.y, -size.z) * 0.5f);
+        corners[3] = transform.TransformPoint(collider.center + 
+            new Vector3(size.x, size.y, -size.z) * 0.5f);
+        corners[4] = transform.TransformPoint(collider.center + 
+            new Vector3(-size.x, -size.y, size.z) * 0.5f);
+        corners[5] = transform.TransformPoint(collider.center + 
+            new Vector3(size.x, -size.y, size.z) * 0.5f);
+        corners[6] = transform.TransformPoint(collider.center + 
+            new Vector3(-size.x, size.y, size.z) * 0.5f);
+        corners[7] = transform.TransformPoint(collider.center + 
+            new Vector3(size.x, size.y, size.z) * 0.5f);
+
+        // Create axis-aligned bounding box from corners
+        Bounds bounds = new Bounds(corners[0], Vector3.zero);
+        for (int i = 1; i < 8; i++)
+        {
+            bounds.Encapsulate(corners[i]);
+        }
+
+        return bounds;
+    }
+
     bool IsRoomClipping(RoomData newRoom)
     {
-        //! A décommenter
-        // foreach (RoomData generatedRoom in generatedRooms) {
-        //     if (generatedRoom == null) continue;
-        //     // float temp = GetColliderIntersectionArea(generatedRoom, newRoom);
-        //     if (GetColliderIntersectionArea(generatedRoom, newRoom) > 1f) {
-        //         return true;
-        //     }
-        // }
+        foreach (RoomData generatedRoom in generatedRooms) {
+            if (generatedRoom == null) continue;
+            if (GetColliderIntersectionArea(generatedRoom, newRoom) > 10f) {
+                return true;
+            }
+        }
         return false;
     }
 }
