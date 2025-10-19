@@ -302,12 +302,12 @@ public class LayoutGenerator : MonoBehaviour
 
     bool IsRoomClipping(RoomData newRoom)
     {
-        // foreach (RoomData generatedRoom in generatedRooms) {
-        //     if (generatedRoom == null) continue;
-        //     if (GetColliderIntersectionArea(generatedRoom, newRoom) > 10f) {
-        //         return true;
-        //     }
-        // }
+        foreach (RoomData generatedRoom in generatedRooms) {
+            if (generatedRoom == null) continue;
+            if (GetColliderIntersectionArea(generatedRoom, newRoom) > 10f) {
+                return true;
+            }
+        }
         return false;
     }
 }
