@@ -39,10 +39,8 @@ public abstract class NetworkPlayerController : NetworkBehaviour
     {
         base.OnNetworkSpawn();
 
-        // Si c'est le joueur local
         if (IsOwner)
         {
-            // Activer les inputs
             inputActions.PlayerControls.Enable();
             inputActions.PlayerControls.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
             inputActions.PlayerControls.Move.canceled += ctx => moveInput = Vector2.zero;
@@ -52,11 +50,9 @@ public abstract class NetworkPlayerController : NetworkBehaviour
 
             inputActions.PlayerControls.Jump.performed += ctx => Jump();
 
-            // Verrouiller et cacher le curseur
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 
-            // Activer la caméra locale
             if (cameraTransform != null)
             {
                 Camera cam = cameraTransform.GetComponent<Camera>();
@@ -68,7 +64,6 @@ public abstract class NetworkPlayerController : NetworkBehaviour
         }
         else
         {
-            // Désactiver la caméra des autres joueurs
             if (disableNonLocalCamera && cameraTransform != null)
             {
                 Camera cam = cameraTransform.GetComponent<Camera>();
@@ -79,7 +74,6 @@ public abstract class NetworkPlayerController : NetworkBehaviour
             }
         }
 
-        // S'abonner aux changements de variables réseau (pour les clients non-propriétaires)
         if (!IsOwner)
         {
             networkPosition.OnValueChanged += OnPositionChanged;
@@ -95,6 +89,8 @@ public abstract class NetworkPlayerController : NetworkBehaviour
         if (inputActions != null)
         {
             inputActions.PlayerControls.Disable();
+            inputActions.Dispose();
+            inputActions = null;
         }
 
         if (!IsOwner)
@@ -105,13 +101,22 @@ public abstract class NetworkPlayerController : NetworkBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        if (inputActions != null)
+        {
+            inputActions.PlayerControls.Disable();
+            inputActions.Dispose();
+            inputActions = null;
+        }
+    }
+
     private void Update()
     {
         if (!IsOwner) return;
 
         HandleLook();
 
-        // Envoyer la position au serveur à chaque frame
         UpdateNetworkStateServerRpc(transform.position, transform.rotation, xRotation);
     }
 
@@ -128,7 +133,6 @@ public abstract class NetworkPlayerController : NetworkBehaviour
         Vector3 targetVelocity = moveDirection * moveSpeed;
         Vector3 currentVelocity = rb.linearVelocity;
 
-        // Conserve la vitesse verticale (gravité / saut)
         targetVelocity.y = currentVelocity.y;
         rb.linearVelocity = targetVelocity;
     }
@@ -160,7 +164,6 @@ public abstract class NetworkPlayerController : NetworkBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        // Détection sol simplifiée (par contact)
         if (collision.contacts.Length > 0)
         {
             ContactPoint contact = collision.contacts[0];
@@ -176,22 +179,18 @@ public abstract class NetworkPlayerController : NetworkBehaviour
     [ServerRpc]
     private void UpdateNetworkStateServerRpc(Vector3 position, Quaternion rotation, float camRotation)
     {
-        // Le serveur met à jour les NetworkVariables
         networkPosition.Value = position;
         networkRotation.Value = rotation;
         networkCameraRotation.Value = camRotation;
     }
 
-    // Callbacks appelés quand les NetworkVariables changent (pour les clients non-propriétaires)
     private void OnPositionChanged(Vector3 oldValue, Vector3 newValue)
     {
-        // Interpolation smooth vers la nouvelle position
         transform.position = Vector3.Lerp(transform.position, newValue, Time.deltaTime * 10f);
     }
 
     private void OnRotationChanged(Quaternion oldValue, Quaternion newValue)
     {
-        // Interpolation smooth vers la nouvelle rotation
         transform.rotation = Quaternion.Lerp(transform.rotation, newValue, Time.deltaTime * 10f);
     }
 

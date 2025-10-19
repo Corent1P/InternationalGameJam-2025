@@ -273,6 +273,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItemButton
   nameText: {fileID: 8297585224688140318}
   priceText: {fileID: 3755915915305639242}
+  button: {fileID: 3196656924296652424}
 --- !u!1 &9211617684990061587
 GameObject:
   m_ObjectHideFlags: 0

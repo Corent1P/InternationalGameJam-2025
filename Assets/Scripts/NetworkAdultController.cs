@@ -4,8 +4,16 @@ using Unity.Netcode;
 [RequireComponent(typeof(AdultManager))]
 public class NetworkAdultController : NetworkPlayerController
 {
-    [Header("Shop")]
-    public ShopRadialMenu shopMenu;
+    [Header("UI Prefabs")]
+    public GameObject uiPrefabShop;
+    public GameObject uiPrefabInventory;
+    private ShopManager shopManager;
+
+    private GameObject uiShopInstance;
+    private GameObject uiInventoryInstance;
+
+    private ShopRadialMenu shopMenu;
+    private InventoryUI inventoryUI;
 
     private AdultManager adultManager;
     private Animator animator;
@@ -19,7 +27,10 @@ public class NetworkAdultController : NetworkPlayerController
         base.Awake();
         adultManager = GetComponent<AdultManager>();
         animator = GetComponentInChildren<Animator>();
+        shopManager = GetComponent<ShopManager>();
     }
+
+    public ShopRadialMenu GetShopMenu() => shopMenu;
 
     public override void OnNetworkSpawn()
     {
@@ -27,22 +38,61 @@ public class NetworkAdultController : NetworkPlayerController
 
         networkAnimSpeed.OnValueChanged += OnAnimSpeedChanged;
 
-        if (!IsOwner) {
-            Debug.LogWarning("[NetworkAdultController] This controller is not the owner, skipping shop init.");
+        if (!IsOwner)
+        {
+            Debug.Log($"[NetworkAdultController] Not owner, skipping UI initialization for {gameObject.name}.");
             return;
         }
 
-        if (shopMenu == null) {
-            shopMenu = FindObjectOfType<ShopRadialMenu>(true);
-
-            if (shopMenu == null) {
-                Debug.LogError("[NetworkAdultController] No ShopRadialMenu found in scene!");
-                return;
-            }
+        if (adultManager == null)
+        {
+            Debug.LogWarning("[NetworkAdultController] No AdultManager found — skipping UI initialization.");
+            return;
         }
 
-        shopMenu.gameObject.SetActive(true);
-        Debug.Log("[NetworkAdultController] Shop menu successfully linked and activated for adult.");
+        if (uiPrefabShop != null)
+        {
+            uiShopInstance = Instantiate(uiPrefabShop);
+            uiShopInstance.name = $"{gameObject.name}_ShopUI";
+
+            shopMenu = uiShopInstance.GetComponentInChildren<ShopRadialMenu>(true);
+            if (shopMenu != null)
+            {
+                shopMenu.gameObject.SetActive(true);
+                shopMenu.SetAdultController(this);
+                shopMenu.SetShopManager(shopManager);
+                Debug.Log("[NetworkAdultController] Shop menu instantiated and linked successfully.");
+            }
+            else
+            {
+                Debug.LogError("[NetworkAdultController] ShopRadialMenu component not found in Shop UI prefab!");
+            }
+        }
+        else
+        {
+            Debug.LogError("[NetworkAdultController] No Shop UI prefab assigned!");
+        }
+        if (uiPrefabInventory != null)
+        {
+            uiInventoryInstance = Instantiate(uiPrefabInventory);
+            uiInventoryInstance.name = $"{gameObject.name}_InventoryUI";
+
+            inventoryUI = uiInventoryInstance.GetComponentInChildren<InventoryUI>(true);
+            if (inventoryUI != null)
+            {
+                inventoryUI.gameObject.SetActive(true);
+                inventoryUI.Initialize(this);
+                Debug.Log("[NetworkAdultController] Inventory UI instantiated and linked successfully.");
+            }
+            else
+            {
+                Debug.LogError("[NetworkAdultController] InventoryUI component not found in Inventory UI prefab!");
+            }
+        }
+        else
+        {
+            Debug.LogError("[NetworkAdultController] No Inventory UI prefab assigned!");
+        }
     }
 
     public override void OnNetworkDespawn()

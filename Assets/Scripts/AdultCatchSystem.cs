@@ -20,6 +20,7 @@ public class AdultCatchSystem : NetworkBehaviour
     [Header("Visual Feedback")]
     [SerializeField] private ParticleSystem dashEffect;
     [SerializeField] private ParticleSystem catchEffect;
+    [SerializeField] private NetworkSoundManager networkSoundManager;
 
     private AdultManager adultManager;
     private Rigidbody rb;
@@ -33,6 +34,7 @@ public class AdultCatchSystem : NetworkBehaviour
     {
         adultManager = GetComponent<AdultManager>();
         rb = GetComponent<Rigidbody>();
+        networkSoundManager = FindAnyObjectByType<NetworkSoundManager>();
         
         // Initialiser les inputs
         playerInputs = new PlayerInputs();
@@ -45,7 +47,7 @@ public class AdultCatchSystem : NetworkBehaviour
         if (IsOwner)
         {
             playerInputs.PlayerControls.Enable();
-            playerInputs.PlayerControls.Interact.performed += ctx => TryDashCatch();
+            playerInputs.PlayerControls.Dash.performed += ctx => TryDashCatch();
         }
     }
 
@@ -55,7 +57,7 @@ public class AdultCatchSystem : NetworkBehaviour
         
         if (IsOwner)
         {
-            playerInputs.PlayerControls.Interact.performed -= ctx => TryDashCatch();
+            playerInputs.PlayerControls.Dash.performed -= ctx => TryDashCatch();
             playerInputs.PlayerControls.Disable();
         }
     }
@@ -66,7 +68,7 @@ public class AdultCatchSystem : NetworkBehaviour
     }
 
     /// <summary>
-    /// Appelé quand le joueur appuie sur Interact
+    /// Appelé quand le joueur appuie sur Dash
     /// </summary>
     private void TryDashCatch()
     {
@@ -132,6 +134,12 @@ public class AdultCatchSystem : NetworkBehaviour
         if (dashEffect != null && IsOwner)
         {
             dashEffect.Play();
+        }
+
+        // Son du dash
+        if (networkSoundManager != null)
+        {
+            networkSoundManager.PlayDashSound(transform.position);
         }
 
         Vector3 direction = dashDirection.normalized;

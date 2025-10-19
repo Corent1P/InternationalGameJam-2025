@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 8688685908189345729}
   - component: {fileID: 6337961140825184470}
   - component: {fileID: 1589839281656844463}
+  - component: {fileID: 5454596173392547724}
   m_Layer: 9
   m_Name: NetworkChildren
   m_TagString: Child
@@ -217,6 +218,26 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5454596173392547724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5012626422881075760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 644c163e3a3504d408bd2c2753f635f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerFootsteps
+  ShowTopMostFoldoutHeaderGroup: 1
+  stepInterval: 0.5
+  minSpeedForFootsteps: 0.1
+  playOnlyWhenGrounded: 1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  groundCheckDistance: 0.3
 --- !u!1 &5286102647677527768
 GameObject:
   m_ObjectHideFlags: 0
