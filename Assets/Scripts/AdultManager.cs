@@ -15,6 +15,10 @@ public class AdultManager : NetworkBehaviour
     public int maxInventorySize = 10;
     private List<GameObject> inventory = new List<GameObject>();
 
+    // 🔥 NOUVEAU : Liste de référence pour la synchronisation
+    [Header("Item Prefabs Reference")]
+    [SerializeField] private List<GameObject> allItemPrefabs = new List<GameObject>();
+
     #region Coins Management
     public void SetCoins(int amount)
     {
@@ -92,6 +96,7 @@ public class AdultManager : NetworkBehaviour
     #endregion
 
     #region Inventory Management
+    // 🔥 MODIFIÉ : Ajout de synchronisation
     public bool AddItemToInventory(GameObject itemPrefab)
     {
         if (!IsServer)
@@ -113,10 +118,38 @@ public class AdultManager : NetworkBehaviour
         }
 
         inventory.Add(itemPrefab);
-        Debug.Log($"✅ Added {itemPrefab.name} to inventory! ({inventory.Count}/{maxInventorySize})");
+        Debug.Log($"✅ [SERVER] Added {itemPrefab.name} to inventory! ({inventory.Count}/{maxInventorySize})");
+
+        // 🔥 NOUVEAU : Synchroniser avec tous les clients
+        SyncInventoryAddClientRpc(itemPrefab.name);
+
         return true;
     }
 
+    // 🔥 NOUVEAU : Synchronisation de l'ajout d'item
+    [ClientRpc]
+    private void SyncInventoryAddClientRpc(string prefabName)
+    {
+        // Ne pas exécuter sur le serveur (déjà fait)
+        if (IsServer) return;
+
+        GameObject prefab = FindPrefabByName(prefabName);
+
+        if (prefab != null)
+        {
+            inventory.Add(prefab);
+            Debug.Log($"✅ [CLIENT] Added {prefabName} to inventory! ({inventory.Count}/{maxInventorySize})");
+
+            // Rafraîchir l'UI si nécessaire
+            RefreshInventoryUIIfOwner();
+        }
+        else
+        {
+            Debug.LogError($"❌ [CLIENT] Could not find prefab: {prefabName}");
+        }
+    }
+
+    // 🔥 MODIFIÉ : Ajout de synchronisation
     public bool RemoveItemFromInventory(int index)
     {
         if (!IsServer)
@@ -133,7 +166,11 @@ public class AdultManager : NetworkBehaviour
 
         GameObject item = inventory[index];
         inventory.RemoveAt(index);
-        Debug.Log($"❌ Removed {item.name} from inventory! ({inventory.Count}/{maxInventorySize})");
+        Debug.Log($"❌ [SERVER] Removed {item.name} from inventory! ({inventory.Count}/{maxInventorySize})");
+
+        // 🔥 NOUVEAU : Synchroniser avec tous les clients
+        SyncInventoryRemoveClientRpc(index);
+
         return true;
     }
 
@@ -141,6 +178,79 @@ public class AdultManager : NetworkBehaviour
     private void RemoveItemServerRpc(int index)
     {
         RemoveItemFromInventory(index);
+    }
+
+    // 🔥 NOUVEAU : Synchronisation de la suppression d'item
+    [ClientRpc]
+    private void SyncInventoryRemoveClientRpc(int index)
+    {
+        // Ne pas exécuter sur le serveur (déjà fait)
+        if (IsServer) return;
+
+        if (index >= 0 && index < inventory.Count)
+        {
+            GameObject item = inventory[index];
+            inventory.RemoveAt(index);
+            Debug.Log($"❌ [CLIENT] Removed {item.name} from inventory! ({inventory.Count}/{maxInventorySize})");
+
+            // Rafraîchir l'UI si nécessaire
+            RefreshInventoryUIIfOwner();
+        }
+    }
+
+    // 🔥 NOUVEAU : Trouver un prefab par son nom
+    private GameObject FindPrefabByName(string prefabName)
+    {
+        // Chercher dans la liste de référence
+        foreach (var prefab in allItemPrefabs)
+        {
+            if (prefab != null && prefab.name == prefabName)
+                return prefab;
+        }
+
+        // Fallback : chercher dans le ShopRadialMenu
+        var controller = GetComponent<NetworkAdultController>();
+        if (controller != null)
+        {
+            var shop = controller.GetShopMenu();
+            if (shop != null && shop.shopItems != null)
+            {
+                foreach (var item in shop.shopItems)
+                {
+                    if (item.itemPrefab != null && item.itemPrefab.name == prefabName)
+                    {
+                        return item.itemPrefab;
+                    }
+                }
+            }
+        }
+
+        Debug.LogError($"❌ Could not find prefab: {prefabName}");
+        return null;
+    }
+
+    // 🔥 NOUVEAU : Rafraîchir l'UI si c'est le propriétaire
+    private void RefreshInventoryUIIfOwner()
+    {
+        if (!IsOwner) return;
+
+        var controller = GetComponent<NetworkAdultController>();
+        if (controller != null)
+        {
+            var inventoryUI = controller.GetComponent<InventoryUI>();
+            if (inventoryUI != null)
+            {
+                // Petit délai pour laisser l'inventaire se mettre à jour
+                StartCoroutine(RefreshUINextFrame(inventoryUI));
+            }
+        }
+    }
+
+    // 🔥 NOUVEAU : Coroutine pour rafraîchir l'UI au prochain frame
+    private System.Collections.IEnumerator RefreshUINextFrame(InventoryUI inventoryUI)
+    {
+        yield return null;
+        inventoryUI.RefreshInventoryUI();
     }
 
     public GameObject GetItemAtIndex(int index)
@@ -179,7 +289,7 @@ public class AdultManager : NetworkBehaviour
         NetworkObject prefabNetObj = trapPrefab.GetComponent<NetworkObject>();
         if (prefabNetObj == null)
         {
-            Debug.LogError($"[AdultManager] Le prefab '{trapPrefab.name}' n’a pas de NetworkObject !");
+            Debug.LogError($"[AdultManager] Le prefab '{trapPrefab.name}' n'a pas de NetworkObject !");
             return;
         }
 
@@ -195,10 +305,10 @@ public class AdultManager : NetworkBehaviour
         }
         else
         {
-            Debug.LogError("[AdultManager] Le piège instancié n’a pas de NetworkObject !");
+            Debug.LogError("[AdultManager] Le piège instancié n'a pas de NetworkObject !");
         }
 
-        // Retirer l’objet de l’inventaire
+        // Retirer l'objet de l'inventaire (synchronisé automatiquement)
         RemoveItemFromInventory(inventoryIndex);
 
         Debug.Log($"🎯 {trapPrefab.name} placé à {position}");
@@ -211,41 +321,7 @@ public class AdultManager : NetworkBehaviour
         PlaceTrap(inventoryIndex, position, rotation);
     }
 
-
-    // public void PlaceTrap(int inventoryIndex, Vector3 position, Quaternion rotation)
-    // {
-    //     if (!IsServer)
-    //     {
-    //         PlaceTrapServerRpc(inventoryIndex, position, rotation);
-    //         return;
-    //     }
-
-    //     GameObject trapPrefab = GetItemAtIndex(inventoryIndex);
-    //     if (trapPrefab == null)
-    //     {
-    //         Debug.LogWarning($"No trap at index {inventoryIndex}");
-    //         return;
-    //     }
-
-    //     GameObject trap = Instantiate(trapPrefab, position, rotation);
-
-    //     NetworkObject networkObject = trap.GetComponent<NetworkObject>();
-    //     if (networkObject != null)
-    //     {
-    //         networkObject.Spawn();
-    //     }
-
-    //     RemoveItemFromInventory(inventoryIndex);
-
-    //     Debug.Log($"🎯 Placed {trapPrefab.name} at {position}");
-    // }
-
-    // [ServerRpc(RequireOwnership = false)]
-    // private void PlaceTrapServerRpc(int inventoryIndex, Vector3 position, Quaternion rotation)
-    // {
-    //     PlaceTrap(inventoryIndex, position, rotation);
-    // }
-
+    // 🔥 MODIFIÉ : Ajout de synchronisation
     public void ClearInventory()
     {
         if (!IsServer)
@@ -254,13 +330,30 @@ public class AdultManager : NetworkBehaviour
             return;
         }
         inventory.Clear();
-        Debug.Log("🗑️ Inventory cleared!");
+        Debug.Log("🗑️ [SERVER] Inventory cleared!");
+
+        // 🔥 NOUVEAU : Synchroniser avec tous les clients
+        SyncInventoryClearClientRpc();
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void ClearInventoryServerRpc()
     {
+        ClearInventory();
+    }
+
+    // 🔥 NOUVEAU : Synchronisation du clear
+    [ClientRpc]
+    private void SyncInventoryClearClientRpc()
+    {
+        // Ne pas exécuter sur le serveur (déjà fait)
+        if (IsServer) return;
+
         inventory.Clear();
+        Debug.Log("🗑️ [CLIENT] Inventory cleared!");
+
+        // Rafraîchir l'UI si nécessaire
+        RefreshInventoryUIIfOwner();
     }
     #endregion
 
@@ -297,14 +390,25 @@ public class AdultManager : NetworkBehaviour
         childrenCaught.Value = 0;
         inventory.Clear();
         Debug.Log("Adult stats reset!");
+
+        // 🔥 NOUVEAU : Synchroniser le reset
+        SyncResetStatsClientRpc();
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void ResetStatsServerRpc()
     {
-        coins.Value = 0;
-        childrenCaught.Value = 0;
+        ResetStats();
+    }
+
+    // 🔥 NOUVEAU : Synchronisation du reset
+    [ClientRpc]
+    private void SyncResetStatsClientRpc()
+    {
+        if (IsServer) return;
+
         inventory.Clear();
+        RefreshInventoryUIIfOwner();
     }
     #endregion
 }

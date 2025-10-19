@@ -34,7 +34,8 @@ public class InventoryUI : MonoBehaviour
 
     public void Initialize(NetworkAdultController controller)
     {
-        if (controller == null) {
+        if (controller == null)
+        {
             Debug.LogError("[InventoryUI] Cannot initialize: controller is null!");
             return;
         }
@@ -104,7 +105,8 @@ public class InventoryUI : MonoBehaviour
         }
     }
 
-    private void RefreshInventoryUI()
+    // 🔥 MODIFIÉ : Rendu public pour pouvoir être appelé depuis AdultManager
+    public void RefreshInventoryUI()
     {
         if (adultManager == null || itemsContainer == null || itemSlotPrefab == null) return;
 
