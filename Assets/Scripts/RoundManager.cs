@@ -149,7 +149,12 @@ public class RoundManager : NetworkBehaviour
             NetworkObject adultNetObj = adultPlayer.GetComponent<NetworkObject>();
             if (adultNetObj != null)
             {
-                TeleportPlayerClientRpc(adultNetObj.NetworkObjectId, adultSpawnPoint.position, adultSpawnPoint.rotation);
+                Vector3 spawnPosition = new Vector3(
+                    adultSpawnPoint.position.x,
+                    adultSpawnPoint.position.y + 1f,
+                    adultSpawnPoint.position.z
+                );
+                TeleportPlayerClientRpc(adultNetObj.NetworkObjectId, spawnPosition, adultSpawnPoint.rotation);
             }
         }
 
