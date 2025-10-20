@@ -390,6 +390,11 @@ public class GameManager : NetworkBehaviour
     {
         Debug.Log("[CLIENT] Game ended");
         // Afficher le scoreboard final
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Menu");
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     private void OnGameStateChanged(GameState oldState, GameState newState)
