@@ -131,13 +131,13 @@ MonoBehaviour:
   selectionRadius: 150
   shopItems:
   - itemName: Paralysis
-    price: 0
+    price: 100
     itemPrefab: {fileID: 625909356469512359, guid: 5b31ad81d2f4f4cc4afa25b6ab7f50ef, type: 3}
   - itemName: Slow Trap
-    price: 0
+    price: 50
     itemPrefab: {fileID: 6532853265911629326, guid: 9dd6d9bb83e2c443d961c4c7ade9673e, type: 3}
   - itemName: Sound Detector Trap
-    price: 0
+    price: 75
     itemPrefab: {fileID: 5495674486607559409, guid: 84559adf26a054cddb18629ab704779a, type: 3}
 --- !u!1 &5115277345681318212
 GameObject:

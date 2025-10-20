@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class AdultManager : NetworkBehaviour
 {
     [Header("Game Stats")]
+    [SerializeField] private int startingCoins = 200;
     private NetworkVariable<int> coins = new NetworkVariable<int>(0);
     private NetworkVariable<int> childrenCaught = new NetworkVariable<int>(0);
 
@@ -26,6 +27,7 @@ public class AdultManager : NetworkBehaviour
         {
             AddItemToInventory(cauldronPrefab);
         }
+        SetCoins(startingCoins);
     }
 
     #region Coins Management
