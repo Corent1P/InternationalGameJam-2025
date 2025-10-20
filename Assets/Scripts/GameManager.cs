@@ -27,6 +27,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private NetworkPlayerSpawner playerSpawner;
     [SerializeField] private RoundManager roundManager;
     [SerializeField] private GameObject temporaryCamera;
+    [SerializeField] private GameObject hudCanvas; // Canvas du HUD à activer au début de la partie
 
     [Header("Game Data")]
     public Dictionary<ulong, PlayerData> playerStatesByID = new();
@@ -46,6 +47,16 @@ public class GameManager : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
     );
+
+    // Timer synchronisé sur le réseau
+    private NetworkVariable<float> phaseRemainingTime = new NetworkVariable<float>(
+        0f,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
+
+    private float phaseStartTime;
+    private float currentPhaseDuration;
 
     private void Awake()
     {
@@ -208,6 +219,10 @@ public class GameManager : NetworkBehaviour
 
         currentRound = 1;
         Debug.Log("=== GAME STARTING ===");
+        
+        // Activer le HUD pour tous les clients
+        ActivateHUDClientRpc();
+        
         StartCoroutine(GameLoop());
     }
 
@@ -229,7 +244,18 @@ public class GameManager : NetworkBehaviour
                 NotifyRoundEndClientRpc(currentRound - 1);
 
                 Debug.Log($"Round {currentRound - 1} finished. Waiting {timeBetweenRounds}s before next round...");
-                yield return new WaitForSeconds(timeBetweenRounds);
+                
+                // Mettre à jour le timer pendant la pause entre les rounds
+                currentPhaseDuration = timeBetweenRounds;
+                phaseRemainingTime.Value = timeBetweenRounds;
+                float elapsedBreak = 0f;
+                
+                while (elapsedBreak < timeBetweenRounds)
+                {
+                    yield return new WaitForSeconds(0.1f);
+                    elapsedBreak += 0.1f;
+                    phaseRemainingTime.Value = Mathf.Max(0, timeBetweenRounds - elapsedBreak);
+                }
             }
         }
 
@@ -243,14 +269,29 @@ public class GameManager : NetworkBehaviour
         currentGameState.Value = GameState.PreparationPhase;
         Debug.Log("=== PREPARATION PHASE ===");
 
+        currentPhaseDuration = roundManager.GetPreparationPhaseDuration();
+        phaseStartTime = Time.time;
+        phaseRemainingTime.Value = currentPhaseDuration;
+
         roundManager.StartPreparationPhase();
         NotifyPreparationPhaseClientRpc();
 
-        yield return new WaitForSeconds(roundManager.GetPreparationPhaseDuration());
+        // Mise à jour du timer pendant la phase de préparation
+        float elapsedPrep = 0f;
+        while (elapsedPrep < currentPhaseDuration)
+        {
+            yield return new WaitForSeconds(0.1f);
+            elapsedPrep += 0.1f;
+            phaseRemainingTime.Value = Mathf.Max(0, currentPhaseDuration - elapsedPrep);
+        }
 
         // Phase de jeu
         currentGameState.Value = GameState.GamePhase;
         Debug.Log("=== GAME PHASE ===");
+
+        currentPhaseDuration = roundManager.GetRoundDuration();
+        phaseStartTime = Time.time;
+        phaseRemainingTime.Value = currentPhaseDuration;
 
         roundManager.StartGamePhase();
         NotifyGamePhaseClientRpc();
@@ -262,14 +303,16 @@ public class GameManager : NetworkBehaviour
 
         while (elapsedTime < roundDuration)
         {
-            yield return new WaitForSeconds(1f);
-            elapsedTime += 1f;
+            yield return new WaitForSeconds(0.1f);
+            elapsedTime += 0.1f;
+            phaseRemainingTime.Value = Mathf.Max(0, roundDuration - elapsedTime);
 
             if (roundManager.AdultHasWon())
             {
                 Debug.Log("Adult won early!");
                 adultWonEarly = true;
                 roundManager.SetFinishedEarlier(true);
+                phaseRemainingTime.Value = 0f;
                 break;
             }
         }
@@ -290,6 +333,7 @@ public class GameManager : NetworkBehaviour
     private void EndGame()
     {
         currentGameState.Value = GameState.GameEnd;
+        phaseRemainingTime.Value = 0f;
         Debug.Log("=== GAME ENDED ===");
 
         NotifyGameEndClientRpc();
@@ -408,6 +452,20 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
+    private void ActivateHUDClientRpc()
+    {
+        if (hudCanvas != null)
+        {
+            hudCanvas.SetActive(true);
+            Debug.Log("[CLIENT] HUD Canvas activated");
+        }
+        else
+        {
+            Debug.LogWarning("[CLIENT] HUD Canvas reference is missing!");
+        }
+    }
+
     #endregion
 
     #region Player Data Management
@@ -432,6 +490,26 @@ public class GameManager : NetworkBehaviour
     public GameState GetCurrentGameState()
     {
         return currentGameState.Value;
+    }
+
+    public int GetCurrentRound()
+    {
+        return currentRound;
+    }
+
+    public int GetTotalRounds()
+    {
+        return numberRounds;
+    }
+
+    public RoundManager GetRoundManager()
+    {
+        return roundManager;
+    }
+
+    public float GetPhaseRemainingTime()
+    {
+        return phaseRemainingTime.Value;
     }
 
     #endregion
