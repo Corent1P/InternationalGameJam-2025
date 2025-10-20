@@ -450,6 +450,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AdultManager
   ShowTopMostFoldoutHeaderGroup: 1
   maxInventorySize: 10
+  allItemPrefabs: []
+  cauldronPrefab: {fileID: 2298444570754790036, guid: 49895813a69244d98b2c7f405e4f8109, type: 3}
 --- !u!114 &508841522827383123
 MonoBehaviour:
   m_ObjectHideFlags: 0

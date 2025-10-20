@@ -152,6 +152,12 @@ public class RelayManager : MonoBehaviour
 
     #region Relay Integration
 
+    public async void StartGame(string sceneToLoad)
+    {
+        gameSceneName = sceneToLoad;
+        StartGame();
+    }
+
     public async void StartGame()
     {
         if (!isHost)

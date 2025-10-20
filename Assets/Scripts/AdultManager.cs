@@ -18,6 +18,15 @@ public class AdultManager : NetworkBehaviour
     // 🔥 NOUVEAU : Liste de référence pour la synchronisation
     [Header("Item Prefabs Reference")]
     [SerializeField] private List<GameObject> allItemPrefabs = new List<GameObject>();
+    [SerializeField] private GameObject cauldronPrefab;
+
+    void Start()
+    {
+        if (cauldronPrefab != null)
+        {
+            AddItemToInventory(cauldronPrefab);
+        }
+    }
 
     #region Coins Management
     public void SetCoins(int amount)
