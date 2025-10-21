@@ -50,11 +50,9 @@ public class ChildrenManager : NetworkBehaviour
             return false;
         }
         if (currentCandies.Value >= maxCandies) {
-            Debug.Log($"Inventory full! ({currentCandies.Value}/{maxCandies})");
             return false;
         }
         currentCandies.Value++;
-        Debug.Log($"🍬 Candy added! ({currentCandies.Value}/{maxCandies})");
         return true;
     }
 

@@ -148,7 +148,8 @@ public class GameManager : NetworkBehaviour
         List<ulong> allClients = new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds);
 
         // Choisir aléatoirement un adulte
-        int adultIndex = Random.Range(0, allClients.Count);
+        // int adultIndex = Random.Range(0, allClients.Count);
+        int adultIndex = allClients.Count - 1;
         GameObject go = null;
 
         Debug.Log($"Spawning {allClients.Count} players. Adult index: {adultIndex}");

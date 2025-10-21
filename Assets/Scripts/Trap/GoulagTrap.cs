@@ -52,8 +52,6 @@ public class GoulagTrap : TrapBase
 
             if (manager != null)
                 manager.ResetCaughtStatus();
-
-            Debug.Log($"{child.name} is now free!");
         }
 
         trappedPlayers.Clear();

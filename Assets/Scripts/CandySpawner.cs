@@ -149,8 +149,6 @@ public class CandySpawner : NetworkBehaviour
                         currentCandyNetworkId.Value = 0;
                         candyAvailable.Value = false;
 
-                        Debug.Log($"🧍 {child.name} collected the candy!");
-
                         // Cache le texte pour tous les clients
                         HideInteractionTextClientRpc();
 

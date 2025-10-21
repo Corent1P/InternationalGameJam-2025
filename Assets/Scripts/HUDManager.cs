@@ -141,7 +141,7 @@ public class HUDManager : MonoBehaviour
         {
             int currentRound = GameManager.Instance.GetCurrentRound();
             int totalRounds = GameManager.Instance.GetTotalRounds();
-            roundText.text = $"Round: {currentRound}/{totalRounds}";
+            roundText.text = "Round: " + currentRound + "/" + totalRounds;
         }
 
         // Mettre à jour le timer
@@ -180,14 +180,15 @@ public class HUDManager : MonoBehaviour
 
         int minutes = Mathf.FloorToInt(timeInSeconds / 60f);
         int seconds = Mathf.FloorToInt(timeInSeconds % 60f);
-        
+
         // Afficher en rouge si moins de 30 secondes (nécessite TextMeshPro rich text)
         if (timeInSeconds <= 30f && timeInSeconds > 0f)
         {
-            return $"<color=red>{minutes:00}:{seconds:00}</color>";
+            return "<color=red>" + (minutes < 10 ? "0" + minutes.ToString() : minutes.ToString()) + ":" + (seconds < 10 ? "0" + seconds.ToString() : seconds.ToString()) + "</color>";
         }
-        
-        return $"{minutes:00}:{seconds:00}";
+
+        // return $"{minutes:00}:{seconds:00}";
+        return (minutes < 10 ? "0" + minutes.ToString() : minutes.ToString()) + ":" + (seconds < 10 ? "0" + seconds.ToString() : seconds.ToString());
     }
 
 }

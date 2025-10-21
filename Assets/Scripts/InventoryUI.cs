@@ -127,11 +127,6 @@ public class InventoryUI : MonoBehaviour
             TextMeshProUGUI nameText = slotObj.GetComponentInChildren<TextMeshProUGUI>();
             Button button = slotObj.GetComponent<Button>();
 
-            if (nameText != null)
-            {
-                nameText.text = $"[{i + 1}] {inventory[i].name}";
-            }
-
             int index = i; // Capture pour le lambda
             if (button != null)
             {
@@ -140,14 +135,11 @@ public class InventoryUI : MonoBehaviour
 
             itemSlots.Add(slotObj);
         }
-
-        Debug.Log($"[InventoryUI] Displayed {inventory.Count} items");
     }
 
     private void OnSlotClicked(int index)
     {
         selectedSlot = index;
-        Debug.Log($"[InventoryUI] Selected slot {index}");
 
         // Highlight visuel
         for (int i = 0; i < itemSlots.Count; i++)
@@ -174,8 +166,6 @@ public class InventoryUI : MonoBehaviour
 
             adultManager.PlaceTrap(selectedSlot, placePosition, placeRotation);
 
-            Debug.Log($"[InventoryUI] Placed item at {placePosition}");
-
             selectedSlot = -1;
             RefreshInventoryUI();
         }
@@ -191,7 +181,6 @@ public class InventoryUI : MonoBehaviour
 
         if (slot >= adultManager.GetInventoryCount())
         {
-            Debug.LogWarning($"[InventoryUI] Slot {slot} is empty!");
             return;
         }
 
@@ -220,8 +209,6 @@ public class InventoryUI : MonoBehaviour
 
         // Rendre semi-transparent
         SetPreviewMaterial(previewInstance, previewMaterial);
-
-        Debug.Log($"[InventoryUI] Started preview for slot {slot}");
     }
 
     private void UpdatePreviewPosition()
@@ -249,7 +236,6 @@ public class InventoryUI : MonoBehaviour
         previewInstance = null;
 
         adultManager.PlaceTrap(previewSlot, pos, rot);
-        Debug.Log($"[InventoryUI] Confirmed placement of item {previewSlot}");
     }
 
     private void CancelPreview()
