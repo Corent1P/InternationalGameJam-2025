@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 2516073001007796326}
   - component: {fileID: 3991856173139384547}
   - component: {fileID: 6911843303680450854}
-  - component: {fileID: 2563849949267058720}
   - component: {fileID: -8625368730621891368}
   - component: {fileID: 9177538655235855801}
   - component: {fileID: -2752843785607715040}
+  - component: {fileID: 8091789729241871773}
   m_Layer: 0
   m_Name: Candy
   m_TagString: Untagged
@@ -93,27 +93,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &2563849949267058720
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1224183604949921331}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.1
-  m_Center: {x: 0.01, y: 0.045, z: 0}
 --- !u!114 &-8625368730621891368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,3 +161,26 @@ MonoBehaviour:
   positionLerpSpeed: 10
   rotationLerpSpeed: 10
   syncInterval: 0.1
+--- !u!136 &8091789729241871773
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1224183604949921331}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.042901322
+  m_Height: 0.18285093
+  m_Direction: 0
+  m_Center: {x: 0.009869322, y: 0.042178527, z: -0.0043441504}

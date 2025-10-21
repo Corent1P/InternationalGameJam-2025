@@ -74,11 +74,8 @@ public class NetworkDoor : NetworkBehaviour
             transform.rotation = closedRotation;
         }
 
-        if (IsOwner)
-        {
-            playerInputs.PlayerControls.Enable();
-            playerInputs.PlayerControls.Interact.performed += ctx => ToggleDoor();
-        }
+        playerInputs.PlayerControls.Enable();
+        playerInputs.PlayerControls.Interact.performed += ctx => ToggleDoor();
     }
 
     public override void OnNetworkDespawn()
@@ -86,11 +83,8 @@ public class NetworkDoor : NetworkBehaviour
         base.OnNetworkDespawn();
         isOpen.OnValueChanged -= OnDoorStateChanged;
 
-        if (IsOwner)
-        {
-            playerInputs.PlayerControls.Interact.performed -= ctx => ToggleDoor();
-            playerInputs.PlayerControls.Disable();
-        }
+        playerInputs.PlayerControls.Interact.performed -= ctx => ToggleDoor();
+        playerInputs.PlayerControls.Disable();
     }
 
     private void Update()
@@ -191,18 +185,26 @@ public class NetworkDoor : NetworkBehaviour
         Debug.Log("Player is in range");
         if (isAnimating) return;
 
-        // Demander au serveur de changer l'état
-        ToggleDoorServerRpc();
+        // Passer la position du joueur au serveur
+        ToggleDoorServerRpc(playerInRange.position);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void ToggleDoorServerRpc()
+    private void ToggleDoorServerRpc(Vector3 playerPosition, ServerRpcParams serverRpcParams = default)
     {
-        if (playerInRange == null) return;
         if (isAnimating) return;
 
-        // Inverser l'état
+        // Vérifier la distance côté serveur
+        float distance = Vector3.Distance(transform.position, playerPosition);
+        if (distance > interactionDistance)
+        {
+            Debug.LogWarning($"Client {serverRpcParams.Receive.SenderClientId} is too far to interact with the door!");
+            return;
+        }
+
+        // Inverser l'état de la porte
         isOpen.Value = !isOpen.Value;
+        Debug.Log($"ToggleDoorServerRpc called by Client {serverRpcParams.Receive.SenderClientId}, new state: {isOpen.Value}");
     }
 
     /// <summary>

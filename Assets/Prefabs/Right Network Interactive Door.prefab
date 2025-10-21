@@ -305,7 +305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3977097331
+  GlobalObjectIdHash: 3992097731
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -358,8 +358,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   interactionDistance: 2
-  interactKey: 101
-  interactButtonName: Interact
   openSound: {fileID: 0}
   closeSound: {fileID: 0}
   networkSoundManager: {fileID: 0}

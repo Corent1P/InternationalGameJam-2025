@@ -30,19 +30,20 @@ public class NetworkAdultController : NetworkPlayerController
         shopManager = GetComponent<ShopManager>();
     }
 
-    public ShopRadialMenu GetShopMenu() => shopMenu;
+    public ShopRadialMenu GetShopMenu()
+    {
+        if (shopMenu == null)
+        {
+            Debug.LogWarning("[NetworkAdultController] shopMenu is null when accessed!");
+        }
+        return shopMenu;
+    }
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
 
         networkAnimSpeed.OnValueChanged += OnAnimSpeedChanged;
-
-        if (!IsOwner)
-        {
-            Debug.Log($"[NetworkAdultController] Not owner, skipping UI initialization for {gameObject.name}.");
-            return;
-        }
 
         if (adultManager == null)
         {

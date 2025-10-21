@@ -1216,7 +1216,11 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   startingCoins: 200
   maxInventorySize: 10
-  allItemPrefabs: []
+  allItemPrefabs:
+  - {fileID: 2298444570754790036, guid: 49895813a69244d98b2c7f405e4f8109, type: 3}
+  - {fileID: 6532853265911629326, guid: 9dd6d9bb83e2c443d961c4c7ade9673e, type: 3}
+  - {fileID: 5495674486607559409, guid: 84559adf26a054cddb18629ab704779a, type: 3}
+  - {fileID: 3361415967608448148, guid: c66a350aaea42434ebbe764ff712de12, type: 3}
   cauldronPrefab: {fileID: 2298444570754790036, guid: 49895813a69244d98b2c7f405e4f8109, type: 3}
 --- !u!114 &508841522827383123
 MonoBehaviour:
