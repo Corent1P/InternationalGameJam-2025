@@ -127,6 +127,11 @@ public class InventoryUI : MonoBehaviour
             TextMeshProUGUI nameText = slotObj.GetComponentInChildren<TextMeshProUGUI>();
             Button button = slotObj.GetComponent<Button>();
 
+            if (nameText != null)
+            {
+                nameText.text = $"[" + (char)('0' + (i % 10)) + "]" + inventory[i].name;
+            }
+
             int index = i; // Capture pour le lambda
             if (button != null)
             {
